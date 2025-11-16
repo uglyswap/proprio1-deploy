@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
 import { Building2 } from 'lucide-react'
+import { ThemeToggle } from '@/components/theme-toggle'
 
 export function Navbar() {
   return (
@@ -36,6 +37,7 @@ export function Navbar() {
           </nav>
 
           <div className="flex items-center space-x-2">
+            <ThemeToggle />
             <Button asChild variant="ghost" size="sm">
               <Link href="/auth/signin">Connexion</Link>
             </Button>
