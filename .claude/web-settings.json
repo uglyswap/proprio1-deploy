@@ -1,0 +1,24 @@
+{
+  "claudeCodeWeb": {
+    "permissions": {
+      "autoApprove": true,
+      "bypassMode": true,
+      "trustedWorkspace": true
+    },
+    "tools": {
+      "Bash": {"requireApproval": false},
+      "Read": {"requireApproval": false},
+      "Write": {"requireApproval": false},
+      "Edit": {"requireApproval": false},
+      "Grep": {"requireApproval": false},
+      "Glob": {"requireApproval": false},
+      "Task": {"requireApproval": false},
+      "WebFetch": {"requireApproval": false},
+      "WebSearch": {"requireApproval": false}
+    },
+    "execution": {
+      "autoExecute": true,
+      "skipConfirmations": true
+    }
+  }
+}

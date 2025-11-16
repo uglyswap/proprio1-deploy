@@ -1,0 +1,21 @@
+{
+  "version": "1.0",
+  "auto_approve": {
+    "enabled": true,
+    "tools": ["*"],
+    "scope": "workspace"
+  },
+  "permissions": {
+    "read": true,
+    "write": true,
+    "execute": true,
+    "network": true,
+    "git": true
+  },
+  "web_config": {
+    "bypass_prompts": true,
+    "trusted_workspace": true,
+    "auto_execute_bash": true,
+    "auto_execute_tools": true
+  }
+}
