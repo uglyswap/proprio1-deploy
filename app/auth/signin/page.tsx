@@ -9,11 +9,13 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from '@/components/ui/card'
 import { Alert, AlertDescription } from '@/components/ui/alert'
+import { Building2, CheckCircle2, Zap, TrendingUp, Database } from 'lucide-react'
 
 export default function SignInPage() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const callbackUrl = searchParams.get('callbackUrl') || '/dashboard'
+  const registered = searchParams.get('registered')
 
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
@@ -46,76 +48,195 @@ export default function SignInPage() {
   }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gray-50 py-12 px-4">
-      <Card className="w-full max-w-md">
-        <CardHeader className="space-y-1">
-          <CardTitle className="text-2xl font-bold text-center">
-            Connexion
-          </CardTitle>
-          <CardDescription className="text-center">
-            Connectez-vous à votre compte ProprioFinder
-          </CardDescription>
-        </CardHeader>
-        <form onSubmit={handleSubmit}>
-          <CardContent className="space-y-4">
-            {error && (
-              <Alert variant="destructive">
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+      {/* Navbar */}
+      <nav className="border-b bg-white/80 backdrop-blur-sm">
+        <div className="container flex h-16 items-center px-4">
+          <Link href="/" className="flex items-center space-x-2 hover:opacity-80 transition-opacity">
+            <Building2 className="h-6 w-6 text-blue-600" />
+            <span className="font-bold text-xl">ProprioFinder</span>
+          </Link>
+        </div>
+      </nav>
 
-            <div className="space-y-2">
-              <Label htmlFor="email">Email</Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="nom@entreprise.com"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                required
-                disabled={isLoading}
-              />
+      <div className="container py-8 md:py-16 px-4">
+        <div className="grid lg:grid-cols-2 gap-12 items-center max-w-6xl mx-auto">
+          {/* Left side - Benefits */}
+          <div className="hidden lg:block space-y-8">
+            <div>
+              <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                Content de vous revoir !
+              </h1>
+              <p className="text-xl text-gray-600 leading-relaxed">
+                Accédez à votre dashboard et continuez à trouver vos propriétaires en un clic
+              </p>
             </div>
 
-            <div className="space-y-2">
-              <div className="flex items-center justify-between">
-                <Label htmlFor="password">Mot de passe</Label>
-                <Link
-                  href="/auth/forgot-password"
-                  className="text-sm text-primary hover:underline"
-                >
-                  Mot de passe oublié ?
-                </Link>
+            {/* Quick stats */}
+            <div className="grid grid-cols-2 gap-4">
+              <div className="bg-white rounded-xl border-2 p-4">
+                <div className="text-3xl font-bold text-blue-600 mb-1">50M+</div>
+                <div className="text-sm text-gray-600">Biens en base</div>
               </div>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                required
-                disabled={isLoading}
-              />
+              <div className="bg-white rounded-xl border-2 p-4">
+                <div className="text-3xl font-bold text-purple-600 mb-1">2.4M+</div>
+                <div className="text-sm text-gray-600">Entreprises SIRENE</div>
+              </div>
+              <div className="bg-white rounded-xl border-2 p-4">
+                <div className="text-3xl font-bold text-green-600 mb-1">98%</div>
+                <div className="text-sm text-gray-600">Taux de réussite</div>
+              </div>
+              <div className="bg-white rounded-xl border-2 p-4">
+                <div className="text-3xl font-bold text-orange-600 mb-1">30s</div>
+                <div className="text-sm text-gray-600">Temps moyen</div>
+              </div>
             </div>
-          </CardContent>
 
-          <CardFooter className="flex flex-col space-y-4">
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={isLoading}
-            >
-              {isLoading ? 'Connexion...' : 'Se connecter'}
-            </Button>
+            {/* Features reminder */}
+            <div className="space-y-3">
+              <div className="flex items-center gap-3 p-3 bg-white rounded-lg border">
+                <div className="h-10 w-10 bg-blue-100 rounded-lg flex items-center justify-center">
+                  <Zap className="h-5 w-5 text-blue-600" />
+                </div>
+                <div>
+                  <div className="font-semibold text-gray-900">Recherche instantanée</div>
+                  <div className="text-sm text-gray-600">Par adresse, propriétaire ou zone</div>
+                </div>
+              </div>
 
-            <div className="text-sm text-center text-muted-foreground">
-              Pas encore de compte ?{' '}
-              <Link href="/auth/signup" className="text-primary hover:underline">
-                Créer un compte
-              </Link>
+              <div className="flex items-center gap-3 p-3 bg-white rounded-lg border">
+                <div className="h-10 w-10 bg-purple-100 rounded-lg flex items-center justify-center">
+                  <Database className="h-5 w-5 text-purple-600" />
+                </div>
+                <div>
+                  <div className="font-semibold text-gray-900">Enrichissement automatique</div>
+                  <div className="text-sm text-gray-600">SIRENE, Pappers, Cadastre, DVF</div>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-3 p-3 bg-white rounded-lg border">
+                <div className="h-10 w-10 bg-green-100 rounded-lg flex items-center justify-center">
+                  <TrendingUp className="h-5 w-5 text-green-600" />
+                </div>
+                <div>
+                  <div className="font-semibold text-gray-900">Analytics avancé</div>
+                  <div className="text-sm text-gray-600">Suivez votre utilisation en temps réel</div>
+                </div>
+              </div>
             </div>
-          </CardFooter>
-        </form>
-      </Card>
+          </div>
+
+          {/* Right side - Form */}
+          <div>
+            <Card className="border-2 shadow-xl">
+              <CardHeader className="space-y-1 pb-6">
+                <CardTitle className="text-3xl font-bold text-center">
+                  Connexion
+                </CardTitle>
+                <CardDescription className="text-center text-base">
+                  Connectez-vous à votre compte ProprioFinder
+                </CardDescription>
+              </CardHeader>
+              <form onSubmit={handleSubmit}>
+                <CardContent className="space-y-4">
+                  {registered && (
+                    <Alert className="bg-green-50 border-green-200">
+                      <CheckCircle2 className="h-4 w-4 text-green-600" />
+                      <AlertDescription className="text-green-800">
+                        Compte créé avec succès ! Vous pouvez maintenant vous connecter.
+                      </AlertDescription>
+                    </Alert>
+                  )}
+
+                  {error && (
+                    <Alert variant="destructive">
+                      <AlertDescription>{error}</AlertDescription>
+                    </Alert>
+                  )}
+
+                  <div className="space-y-2">
+                    <Label htmlFor="email">Email</Label>
+                    <Input
+                      id="email"
+                      type="email"
+                      placeholder="nom@entreprise.com"
+                      className="h-11"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      required
+                      disabled={isLoading}
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <div className="flex items-center justify-between">
+                      <Label htmlFor="password">Mot de passe</Label>
+                      <Link
+                        href="/auth/forgot-password"
+                        className="text-sm text-primary hover:underline"
+                      >
+                        Mot de passe oublié ?
+                      </Link>
+                    </div>
+                    <Input
+                      id="password"
+                      type="password"
+                      className="h-11"
+                      value={password}
+                      onChange={(e) => setPassword(e.target.value)}
+                      required
+                      disabled={isLoading}
+                    />
+                  </div>
+                </CardContent>
+
+                <CardFooter className="flex flex-col space-y-4">
+                  <Button
+                    type="submit"
+                    className="w-full h-12 text-base"
+                    size="lg"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? 'Connexion...' : 'Se connecter'}
+                  </Button>
+
+                  <div className="text-sm text-center text-muted-foreground">
+                    Pas encore de compte ?{' '}
+                    <Link href="/auth/signup" className="text-primary hover:underline font-semibold">
+                      Créer un compte gratuitement
+                    </Link>
+                  </div>
+
+                  <div className="pt-4 border-t">
+                    <div className="flex items-center justify-center gap-4 text-xs text-gray-600">
+                      <div className="flex items-center gap-1">
+                        <CheckCircle2 className="h-3 w-3 text-green-600" />
+                        <span>Essai gratuit 7 jours</span>
+                      </div>
+                      <div className="flex items-center gap-1">
+                        <CheckCircle2 className="h-3 w-3 text-green-600" />
+                        <span>Sans carte bancaire</span>
+                      </div>
+                    </div>
+                  </div>
+                </CardFooter>
+              </form>
+            </Card>
+
+            {/* Mobile quick stats */}
+            <div className="lg:hidden mt-8 grid grid-cols-2 gap-4">
+              <div className="bg-white rounded-xl border-2 p-4 text-center">
+                <div className="text-2xl font-bold text-blue-600 mb-1">50M+</div>
+                <div className="text-xs text-gray-600">Biens en base</div>
+              </div>
+              <div className="lg:hidden bg-white rounded-xl border-2 p-4 text-center">
+                <div className="text-2xl font-bold text-green-600 mb-1">98%</div>
+                <div className="text-xs text-gray-600">Taux de réussite</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   )
 }
