@@ -4,6 +4,8 @@ import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { getUserOrganization } from '@/lib/auth'
 import { SearchType } from '@prisma/client'
+import { countByAddress, countByOwner, countByZone } from '@/lib/data-crosser'
+import { planConfig } from '@/lib/system-config'
 
 export async function POST(req: NextRequest) {
   try {
@@ -28,50 +30,43 @@ export async function POST(req: NextRequest) {
       criteria: any
     }
 
-    // Build query based on search type
+    // Count results using data-crosser (multi-source)
     let estimatedRows = 0
 
-    if (type === 'BY_ADDRESS') {
-      // Count properties at this address
-      const { adresse, codePostal } = criteria
+    try {
+      if (type === 'BY_ADDRESS') {
+        const { adresse, codePostal } = criteria
+        estimatedRows = await countByAddress(adresse, codePostal)
+      } else if (type === 'BY_OWNER') {
+        const { proprietaire, siren } = criteria
+        estimatedRows = await countByOwner(proprietaire, siren)
+      } else if (type === 'BY_ZONE') {
+        const { polygon } = criteria
 
-      estimatedRows = await prisma.$queryRaw<number>`
-        SELECT COUNT(DISTINCT proprietaire_siren)::int
-        FROM your_properties_table
-        WHERE adresse ILIKE ${`%${adresse}%`}
-        ${codePostal ? `AND code_postal = ${codePostal}` : ''}
-      `
-    } else if (type === 'BY_OWNER') {
-      // Count properties owned by this proprietaire
-      const { proprietaire, siren } = criteria
+        // Build bounds from polygon
+        const lngs = polygon.map((p: number[]) => p[0])
+        const lats = polygon.map((p: number[]) => p[1])
 
-      estimatedRows = await prisma.$queryRaw<number>`
-        SELECT COUNT(*)::int
-        FROM your_properties_table
-        WHERE ${siren ? `siren = ${siren}` : `proprietaire ILIKE ${`%${proprietaire}%`}`}
-      `
-    } else if (type === 'BY_ZONE') {
-      // Count properties in geographic zone
-      const { polygon } = criteria
+        const bounds = {
+          minLat: Math.min(...lats),
+          maxLat: Math.max(...lats),
+          minLng: Math.min(...lngs),
+          maxLng: Math.max(...lngs),
+        }
 
-      // Build bbox for quick filter
-      const lngs = polygon.map((p: number[]) => p[0])
-      const lats = polygon.map((p: number[]) => p[1])
-
-      const minLng = Math.min(...lngs)
-      const maxLng = Math.max(...lngs)
-      const minLat = Math.min(...lats)
-      const maxLat = Math.max(...lats)
-
-      estimatedRows = await prisma.$queryRaw<number>`
-        SELECT COUNT(DISTINCT proprietaire_siren)::int
-        FROM your_properties_table
-        WHERE longitude BETWEEN ${minLng} AND ${maxLng}
-        AND latitude BETWEEN ${minLat} AND ${maxLat}
-      `
+        estimatedRows = await countByZone(bounds)
+      }
+    } catch (error: any) {
+      console.error('Data source error:', error)
+      return NextResponse.json(
+        { error: 'Sources de données non configurées. Contactez le support.' },
+        { status: 503 }
+      )
     }
 
-    const estimatedCost = estimatedRows // 1 crédit par ligne
+    // Get credits per result from config (default 10)
+    const creditsPerResult = await planConfig.getCreditsPerResult()
+    const estimatedCost = estimatedRows * creditsPerResult
 
     // Create search record with ESTIMATED status
     const search = await prisma.search.create({
@@ -90,6 +85,7 @@ export async function POST(req: NextRequest) {
       searchId: search.id,
       estimatedRows,
       estimatedCost,
+      creditsPerResult,
       currentBalance: organization.creditBalance,
       remainingBalance: organization.creditBalance - estimatedCost,
       canProceed: organization.creditBalance >= estimatedCost,

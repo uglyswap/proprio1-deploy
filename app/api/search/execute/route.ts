@@ -3,7 +3,8 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { deductCredits } from '@/lib/credits'
-import { generateEnrichmentLinks } from '@/lib/enrichment-links'
+import { searchByAddress, searchByOwner, searchByZone } from '@/lib/data-crosser'
+import { planConfig } from '@/lib/system-config'
 
 export async function POST(req: NextRequest) {
   try {
@@ -32,116 +33,73 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // Execute the actual search based on type
+    // Execute search using data-crosser (with SIRENE enrichment)
     let results: any[] = []
 
-    if (search.type === 'BY_ADDRESS') {
-      const { adresse, codePostal } = search.criteria as any
+    try {
+      if (search.type === 'BY_ADDRESS') {
+        const { adresse, codePostal } = search.criteria as any
+        results = await searchByAddress(adresse, codePostal)
+      } else if (search.type === 'BY_OWNER') {
+        const { proprietaire, siren } = search.criteria as any
+        results = await searchByOwner(proprietaire, siren)
+      } else if (search.type === 'BY_ZONE') {
+        const { polygon } = search.criteria as any
 
-      // NOTE: Replace 'your_properties_table' with your actual table name
-      results = await prisma.$queryRaw`
-        SELECT DISTINCT ON (proprietaire_siren)
-          id,
-          adresse,
-          code_postal,
-          ville,
-          code_commune,
-          proprietaire,
-          siren,
-          company_name,
-          type_local,
-          surface,
-          latitude,
-          longitude,
-          section,
-          numero_parcelle
-        FROM your_properties_table
-        WHERE adresse ILIKE ${`%${adresse}%`}
-        ${codePostal ? `AND code_postal = ${codePostal}` : ''}
-        LIMIT 10000
-      `
-    } else if (search.type === 'BY_OWNER') {
-      const { proprietaire, siren } = search.criteria as any
+        const lngs = polygon.map((p: number[]) => p[0])
+        const lats = polygon.map((p: number[]) => p[1])
 
-      results = await prisma.$queryRaw`
-        SELECT
-          id,
-          adresse,
-          code_postal,
-          ville,
-          code_commune,
-          proprietaire,
-          siren,
-          company_name,
-          type_local,
-          surface,
-          latitude,
-          longitude,
-          section,
-          numero_parcelle
-        FROM your_properties_table
-        WHERE ${siren ? `siren = ${siren}` : `proprietaire ILIKE ${`%${proprietaire}%`}`}
-        LIMIT 10000
-      `
-    } else if (search.type === 'BY_ZONE') {
-      const { polygon } = search.criteria as any
+        const bounds = {
+          minLat: Math.min(...lats),
+          maxLat: Math.max(...lats),
+          minLng: Math.min(...lngs),
+          maxLng: Math.max(...lngs),
+        }
 
-      // Simple bbox filter (you can add precise polygon check with turf.js)
-      const lngs = polygon.map((p: number[]) => p[0])
-      const lats = polygon.map((p: number[]) => p[1])
-
-      const minLng = Math.min(...lngs)
-      const maxLng = Math.max(...lngs)
-      const minLat = Math.min(...lats)
-      const maxLat = Math.max(...lats)
-
-      results = await prisma.$queryRaw`
-        SELECT DISTINCT ON (proprietaire_siren)
-          id,
-          adresse,
-          code_postal,
-          ville,
-          code_commune,
-          proprietaire,
-          siren,
-          company_name,
-          type_local,
-          surface,
-          latitude,
-          longitude,
-          section,
-          numero_parcelle
-        FROM your_properties_table
-        WHERE longitude BETWEEN ${minLng} AND ${maxLng}
-        AND latitude BETWEEN ${minLat} AND ${maxLat}
-        LIMIT 10000
-      `
+        results = await searchByZone(bounds)
+      }
+    } catch (error: any) {
+      console.error('Data source error:', error)
+      return NextResponse.json(
+        { error: 'Sources de données non configurées. Contactez le support.' },
+        { status: 503 }
+      )
     }
 
     const actualRows = results.length
-    const actualCost = actualRows
 
-    // Save results to database
+    // Get credits per result from config
+    const creditsPerResult = await planConfig.getCreditsPerResult()
+    const actualCost = actualRows * creditsPerResult
+
+    // Save results to database with SIRENE enrichment
     const properties = results.map((result: any) => ({
       searchId: search.id,
       adresse: result.adresse,
-      codePostal: result.code_postal,
+      codePostal: result.codePostal,
       ville: result.ville,
-      codeCommune: result.code_commune,
+      codeCommune: result.codeCommune,
+      departement: result.departement,
       proprietaire: result.proprietaire,
       siren: result.siren,
-      companyName: result.company_name,
-      typeLocal: result.type_local,
+      companyName: result.companyName, // From SIRENE
+      dirigeantNom: result.dirigeantNom, // From SIRENE ✅
+      dirigeantPrenom: result.dirigeantPrenom, // From SIRENE ✅
+      dirigeantQualite: result.dirigeantQualite, // From SIRENE ✅
+      siegeAdresse: result.siegeAdresse, // From SIRENE ✅
+      siegeCodePostal: result.siegeCodePostal, // From SIRENE ✅
+      siegeVille: result.siegeVille, // From SIRENE ✅
+      typeLocal: result.typeLocal,
       surface: result.surface,
       latitude: result.latitude,
       longitude: result.longitude,
       section: result.section,
-      numeroParcelle: result.numero_parcelle,
+      numeroParcelle: result.numeroParcelle,
     }))
 
     // Transaction: deduct credits + save results
     await prisma.$transaction(async (tx) => {
-      // Save properties
+      // Save properties with enrichment
       await tx.property.createMany({
         data: properties,
       })
@@ -162,7 +120,7 @@ export async function POST(req: NextRequest) {
         search.organizationId,
         actualCost,
         'SEARCH_COST',
-        `Search: ${search.type}`,
+        `Search: ${search.type} (${actualRows} résultats × ${creditsPerResult} crédits)`,
         searchId
       )
     })
@@ -171,6 +129,7 @@ export async function POST(req: NextRequest) {
       success: true,
       actualRows,
       actualCost,
+      creditsPerResult,
       searchId,
     })
   } catch (error) {
