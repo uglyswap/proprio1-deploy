@@ -1,0 +1,327 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+// ============================================
+// AUTHENTICATION & USERS
+// ============================================
+
+model Account {
+  id                String  @id @default(cuid())
+  userId            String
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String? @db.Text
+  session_state     String?
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@index([userId])
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  sessionToken String   @unique
+  userId       String
+  expires      DateTime
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@index([userId])
+}
+
+model User {
+  id            String    @id @default(cuid())
+  name          String?
+  email         String    @unique
+  emailVerified DateTime?
+  image         String?
+  password      String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+
+  accounts           Account[]
+  sessions           Session[]
+  organizationUsers  OrganizationUser[]
+  searches           Search[]
+
+  @@index([email])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// ============================================
+// ORGANIZATIONS & MULTI-TENANT
+// ============================================
+
+enum UserRole {
+  OWNER
+  ADMIN
+  MEMBER
+}
+
+model Organization {
+  id          String   @id @default(cuid())
+  name        String
+  slug        String   @unique
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Subscription
+  plan             SubscriptionPlan @default(FREE)
+  stripeCustomerId String?          @unique
+
+  // Credits system
+  creditBalance    Int              @default(0)
+
+  // Relations
+  users            OrganizationUser[]
+  searches         Search[]
+  creditTransactions CreditTransaction[]
+  enrichmentLogs   EnrichmentLog[]
+  subscriptions    Subscription[]
+
+  @@index([slug])
+  @@index([stripeCustomerId])
+}
+
+model OrganizationUser {
+  id             String       @id @default(cuid())
+  organizationId String
+  userId         String
+  role           UserRole     @default(MEMBER)
+  createdAt      DateTime     @default(now())
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user           User         @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([organizationId, userId])
+  @@index([userId])
+  @@index([organizationId])
+}
+
+// ============================================
+// SUBSCRIPTION & BILLING
+// ============================================
+
+enum SubscriptionPlan {
+  FREE
+  BASIC
+  PRO
+  ENTERPRISE
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELED
+  INCOMPLETE
+  INCOMPLETE_EXPIRED
+  PAST_DUE
+  TRIALING
+  UNPAID
+}
+
+model Subscription {
+  id                   String             @id @default(cuid())
+  organizationId       String
+
+  stripeSubscriptionId String             @unique
+  stripePriceId        String
+  stripeCurrentPeriodEnd DateTime?
+
+  plan                 SubscriptionPlan
+  status               SubscriptionStatus
+
+  cancelAtPeriodEnd    Boolean            @default(false)
+  canceledAt           DateTime?
+
+  createdAt            DateTime           @default(now())
+  updatedAt            DateTime           @updatedAt
+
+  organization         Organization       @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([stripeSubscriptionId])
+}
+
+// ============================================
+// CREDITS SYSTEM
+// ============================================
+
+enum TransactionType {
+  PURCHASE           // Achat de crédits
+  SUBSCRIPTION       // Crédits inclus dans abonnement
+  SEARCH_COST        // Consommation pour recherche
+  ENRICHMENT_COST    // Consommation pour enrichissement
+  REFUND             // Remboursement
+  ADJUSTMENT         // Ajustement manuel
+}
+
+model CreditTransaction {
+  id             String          @id @default(cuid())
+  organizationId String
+  amount         Int             // Positif = ajout, négatif = débit
+  type           TransactionType
+  description    String?
+
+  searchId       String?
+  enrichmentId   String?
+
+  createdAt      DateTime        @default(now())
+
+  organization   Organization    @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  search         Search?         @relation(fields: [searchId], references: [id])
+
+  @@index([organizationId])
+  @@index([searchId])
+  @@index([createdAt])
+}
+
+// ============================================
+// SEARCH & PROPERTIES
+// ============================================
+
+enum SearchType {
+  BY_ADDRESS     // Recherche par adresse
+  BY_OWNER       // Recherche par propriétaire
+  BY_ZONE        // Recherche par zone géographique
+}
+
+enum SearchStatus {
+  ESTIMATED      // Estimation faite, en attente de validation
+  VALIDATED      // Validée, en cours d'exécution
+  COMPLETED      // Terminée, résultats disponibles
+  ENRICHING      // En cours d'enrichissement
+  ENRICHED       // Enrichie
+  FAILED         // Échec
+}
+
+model Search {
+  id              String       @id @default(cuid())
+  organizationId  String
+  userId          String
+
+  type            SearchType
+  status          SearchStatus @default(ESTIMATED)
+
+  // Critères de recherche
+  criteria        Json         // Stockage flexible des critères
+
+  // Estimation
+  estimatedRows   Int?
+  estimatedCost   Int?         // En crédits
+
+  // Résultats
+  actualRows      Int?
+  actualCost      Int?
+
+  // Enrichissement
+  enrichRequested Boolean      @default(false)
+  enrichedAt      DateTime?
+
+  // Métadonnées
+  createdAt       DateTime     @default(now())
+  validatedAt     DateTime?
+  completedAt     DateTime?
+
+  // Relations
+  organization    Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+  user            User         @relation(fields: [userId], references: [id])
+  properties      Property[]
+  transactions    CreditTransaction[]
+
+  @@index([organizationId])
+  @@index([userId])
+  @@index([status])
+  @@index([createdAt])
+}
+
+model Property {
+  id              String    @id @default(cuid())
+  searchId        String
+
+  // Données brutes (de votre base PostgreSQL existante)
+  adresse         String
+  codePostal      String?
+  ville           String?
+  codeCommune     String?
+  departement     String?
+
+  proprietaire    String
+  siren           String?
+  companyName     String?
+
+  typeLocal       String?
+  surface         Decimal?  @db.Decimal(10, 2)
+
+  // Coordonnées géographiques
+  latitude        Decimal?  @db.Decimal(10, 8)
+  longitude       Decimal?  @db.Decimal(11, 8)
+
+  // Parcelle cadastre
+  section         String?
+  numeroParcelle  String?
+
+  // Enrichissement contact (Dropcontact)
+  email           String?
+  emailVerified   Boolean   @default(false)
+  phone           String?
+  mobilePhone     String?
+  linkedin        String?
+  jobTitle        String?
+  enrichedAt      DateTime?
+  enrichmentConfidence Int?
+
+  // Métadonnées
+  createdAt       DateTime  @default(now())
+
+  // Relations
+  search          Search    @relation(fields: [searchId], references: [id], onDelete: Cascade)
+
+  @@index([searchId])
+  @@index([siren])
+  @@index([codePostal])
+  @@index([codeCommune])
+}
+
+// ============================================
+// ENRICHMENT LOGS
+// ============================================
+
+model EnrichmentLog {
+  id             String       @id @default(cuid())
+  searchId       String
+  organizationId String
+
+  provider       String       // "dropcontact"
+  successCount   Int          @default(0)
+  failureCount   Int          @default(0)
+  cost           Decimal      @db.Decimal(10, 4)
+
+  completedAt    DateTime     @default(now())
+
+  organization   Organization @relation(fields: [organizationId], references: [id], onDelete: Cascade)
+
+  @@index([organizationId])
+  @@index([searchId])
+}
