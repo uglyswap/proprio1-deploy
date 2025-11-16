@@ -1,6 +1,6 @@
 import Link from 'next/link'
 import { Button } from '@/components/ui/button'
-import { Building2, Menu } from 'lucide-react'
+import { Building2 } from 'lucide-react'
 
 export function Navbar() {
   return (
