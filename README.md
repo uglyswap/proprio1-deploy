@@ -1,96 +1,86 @@
-# Proprio1 - Configuration de Bypass de Permissions pour Claude Code Web
+# Proprio1 - Guide de Permissions pour Claude Code Web
 
-Ce dépôt contient la configuration pour activer le mode de bypass de permissions dans **Claude Code sur le Web**.
+Ce dépôt contient des informations et configurations pour gérer les permissions dans **Claude Code sur le Web**.
 
-## Fonctionnalité
+## Comment fonctionnent les permissions sur Claude Code Web
 
-Cette configuration permet à Claude Code Web de fonctionner en mode autonome sans demander constamment la permission de l'utilisateur pour exécuter des outils et des commandes.
+Sur la version web de Claude Code, les permissions sont gérées directement par l'interface web lorsque Claude tente d'utiliser des outils. Il n'existe pas de fichiers de configuration qui permettent de bypasser automatiquement toutes les demandes.
 
-## Configuration
+## Solutions pour éviter les demandes répétées
 
-Les fichiers de configuration suivants sont inclus :
+### ✅ Solution 1 : Cocher "Remember this decision" (Recommandé)
+
+Quand une popup de permission apparaît pour un outil :
+1. **Cochez la case "Remember this decision"** ou **"Se souvenir de ce choix"**
+2. Cliquez sur "Allow" ou "Autoriser"
+3. Cette permission sera mémorisée pour ce dépôt
+
+### ✅ Solution 2 : Utiliser un dépôt de confiance
+
+Certains dépôts peuvent être marqués comme "trusted" (de confiance) :
+1. Quand le message apparaît pour la première fois
+2. Cherchez une option du type "Trust this repository"
+3. Cela réduit le nombre de demandes de permission
+
+### ✅ Solution 3 : Accepter les permissions au fil de l'eau
+
+La première fois que vous utilisez le dépôt :
+- Claude demandera la permission pour chaque type d'outil
+- Une fois accordée avec "Remember", ces permissions persistent
+- Après quelques interactions, la plupart des outils seront pré-approuvés
+
+## Fichiers de configuration inclus
+
+Ce dépôt contient des fichiers de configuration qui **peuvent** être utilisés par certaines versions de Claude Code :
 
 ### `.claude/permissions.json`
-Configuration des permissions auto-approuvées pour tous les outils et opérations.
+Définit les permissions souhaitées pour le projet (format de référence)
 
 ### `.claude/web-settings.json`
-Configuration spécifique pour Claude Code Web avec bypass des confirmations.
+Configuration suggérée pour les outils et opérations
 
-## Paramètres activés
+**Note** : Ces fichiers servent principalement de documentation et peuvent ne pas être directement interprétés par la version web actuelle
 
-- ✅ **Bypass des permissions** : Désactive les demandes de confirmation répétées
-- ✅ **Mode de confiance** : Active le mode workspace de confiance
-- ✅ **Auto-exécution** : Les outils s'exécutent automatiquement sans prompt
-- ✅ **Auto-approbation** : Tous les outils (`*`) sont pré-approuvés
-- ✅ **Opérations autorisées** : read, write, execute, network, git
+## Outils qui peuvent demander des permissions
 
-## Utilisation pour Claude Code Web
+Voici les outils qui peuvent nécessiter une approbation :
+- 🔧 **Bash** - Exécution de commandes shell
+- 📖 **Read** - Lecture de fichiers
+- ✏️ **Write** - Création de nouveaux fichiers
+- ✂️ **Edit** - Modification de fichiers existants
+- 🔍 **Grep** - Recherche dans les fichiers
+- 📁 **Glob** - Recherche de fichiers par pattern
+- 🤖 **Task** - Lancement d'agents de tâches
+- 🌐 **WebFetch** - Récupération de contenu web
+- 🔎 **WebSearch** - Recherche sur le web
 
-### Méthode 1 : Via l'interface web
-1. Ouvrir Claude Code sur le web (https://claude.ai/code)
-2. Connecter ce dépôt à votre workspace
-3. Dans les paramètres du projet, activer "Trusted Workspace"
-4. Les fichiers `.claude/*.json` seront automatiquement détectés
+## Conseils pratiques
 
-### Méthode 2 : Configuration manuelle
-1. Dans l'interface Claude Code Web, cliquer sur l'icône de paramètres
-2. Activer l'option "Auto-approve tool executions"
-3. Cocher "Trust this workspace"
-4. Sauvegarder les préférences
+### Pour une expérience fluide :
+1. **Lors de la première utilisation** : Acceptez les permissions pour les outils de base (Read, Grep, Glob)
+2. **Cochez toujours "Remember"** : Cela évite les demandes futures
+3. **Soyez patient** : Après 3-4 demandes initiales, l'expérience devient fluide
 
-### Méthode 3 : Déclarer le workspace comme fiable dès le début
-Lorsque Claude Code Web vous demande la première fois si vous faites confiance au workspace, cliquer sur "Always trust" au lieu de "Trust once"
+### Ce qui est mémorisé :
+- ✅ Les permissions sont mémorisées **par dépôt**
+- ✅ Les permissions persistent entre les sessions
+- ✅ Vous pouvez révoquer les permissions à tout moment
 
-## Comment cela fonctionne
+## En résumé
 
-Les fichiers de configuration dans `.claude/` sont lus par Claude Code Web pour définir le comportement des permissions :
+**La vraie solution** pour éviter les demandes répétées sur Claude Code Web :
+1. Cochez **"Remember this decision"** à chaque popup
+2. Accordez les permissions pour les outils dont vous avez besoin
+3. Après quelques interactions, vous n'aurez plus de demandes
 
-- **permissions.json** : Définit quels outils et opérations sont auto-approuvés
-- **web-settings.json** : Configure le comportement spécifique à la version web
-
-Lorsque vous ouvrez ce workspace dans Claude Code Web, le système détecte ces fichiers et applique les paramètres de bypass automatiquement.
-
-## Instructions détaillées
-
-### Pour éviter les demandes répétées :
-
-1. **Au premier lancement** : Quand Claude Code Web vous demande si vous faites confiance au workspace, sélectionnez **"Always trust"** ou **"Toujours faire confiance"**
-
-2. **Si déjà en session** :
-   - Cliquez sur l'icône ⚙️ (paramètres) en haut à droite
-   - Activez "Auto-approve tool executions"
-   - Activez "Trusted workspace mode"
-   - Cliquez sur "Save" ou "Enregistrer"
-
-3. **Pour ce dépôt spécifique** :
-   - Les fichiers `.claude/*.json` sont déjà configurés
-   - Ils seront automatiquement appliqués une fois le workspace approuvé
-
-## Outils auto-approuvés
-
-Avec cette configuration, les outils suivants n'exigeront plus de confirmation :
-- ✅ Bash (exécution de commandes)
-- ✅ Read (lecture de fichiers)
-- ✅ Write (écriture de fichiers)
-- ✅ Edit (modification de fichiers)
-- ✅ Grep (recherche dans les fichiers)
-- ✅ Glob (recherche de fichiers)
-- ✅ Task (agents de tâches)
-- ✅ WebFetch (requêtes web)
-- ✅ WebSearch (recherche web)
+Il n'existe pas de "mode bypass complet" sur la version web pour des raisons de sécurité.
 
 ## Sécurité
 
-⚠️ **Avertissement** : Cette configuration désactive les protections de sécurité par défaut.
-Utilisez uniquement dans un environnement de confiance et pour des projets dont vous contrôlez le code source.
-
-## Support
-
-Si vous rencontrez des problèmes :
-1. Rechargez la page du navigateur
-2. Déconnectez-vous et reconnectez-vous à Claude Code Web
-3. Vérifiez que les fichiers `.claude/*.json` sont bien présents dans le dépôt
-4. Assurez-vous d'avoir bien activé "Trusted workspace" dans les paramètres
+⚠️ **Note importante** : Les permissions existent pour votre protection. En les accordant, vous permettez à Claude d'accéder et de modifier vos fichiers. Assurez-vous de :
+- Utiliser Claude Code uniquement sur des dépôts de confiance
+- Vérifier les changements avant de les accepter
+- Utiliser le contrôle de version (git) pour pouvoir annuler les modifications
 
 ## Licence
 
