@@ -51,6 +51,7 @@ model User {
   emailVerified DateTime?
   image         String?
   password      String?
+  isSuperAdmin  Boolean   @default(false) // Flag pour super admin
   createdAt     DateTime  @default(now())
   updatedAt     DateTime  @updatedAt
 
@@ -58,8 +59,10 @@ model User {
   sessions           Session[]
   organizationUsers  OrganizationUser[]
   searches           Search[]
+  auditLogs          AuditLog[]
 
   @@index([email])
+  @@index([isSuperAdmin])
 }
 
 model VerificationToken {
@@ -75,9 +78,10 @@ model VerificationToken {
 // ============================================
 
 enum UserRole {
-  OWNER
-  ADMIN
-  MEMBER
+  SUPER_ADMIN  // Vous, l'opérateur du SaaS
+  OWNER        // Propriétaire d'organisation
+  ADMIN        // Admin d'organisation
+  MEMBER       // Membre simple
 }
 
 model Organization {
@@ -92,7 +96,13 @@ model Organization {
   stripeCustomerId String?          @unique
 
   // Credits system
-  creditBalance    Int              @default(0)
+  creditBalance        Int      @default(0)
+  creditsResetAt       DateTime? // Date du dernier reset mensuel
+  monthlyCredits       Int      @default(0) // Crédits alloués par mois
+
+  // Features
+  isActive             Boolean  @default(true)
+  canUseEnrichment     Boolean  @default(false)
 
   // Relations
   users            OrganizationUser[]
@@ -103,6 +113,7 @@ model Organization {
 
   @@index([slug])
   @@index([stripeCustomerId])
+  @@index([plan])
 }
 
 model OrganizationUser {
@@ -267,9 +278,20 @@ model Property {
   codeCommune     String?
   departement     String?
 
-  proprietaire    String
+  // Propriétaire (personne morale)
+  proprietaire    String    // Nom du propriétaire initial
   siren           String?
-  companyName     String?
+  companyName     String?   // Nom de la société (SIRENE)
+
+  // Dirigeant (croisé avec SIRENE)
+  dirigeantNom    String?
+  dirigeantPrenom String?
+  dirigeantQualite String?  // "Président", "Gérant", etc.
+
+  // Siège social (SIRENE)
+  siegeAdresse    String?
+  siegeCodePostal String?
+  siegeVille      String?
 
   typeLocal       String?
   surface         Decimal?  @db.Decimal(10, 2)
@@ -282,7 +304,7 @@ model Property {
   section         String?
   numeroParcelle  String?
 
-  // Enrichissement contact (Dropcontact)
+  // Enrichissement contact (optionnel, payant)
   email           String?
   emailVerified   Boolean   @default(false)
   phone           String?
@@ -324,4 +346,261 @@ model EnrichmentLog {
 
   @@index([organizationId])
   @@index([searchId])
+}
+
+// ============================================
+// SYSTEM CONFIGURATION (Super Admin)
+// ============================================
+
+enum ConfigCategory {
+  STRIPE
+  API
+  DATABASE
+  FEATURE
+  BILLING
+}
+
+model SystemConfig {
+  id          String         @id @default(cuid())
+  category    ConfigCategory
+  key         String         @unique
+  value       String?        @db.Text // Encrypted pour les secrets
+  isEncrypted Boolean        @default(false)
+  description String?
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  @@index([category])
+  @@index([key])
+}
+
+// ============================================
+// PLAN CONFIGURATION (Dynamic Plans)
+// ============================================
+
+model PlanConfig {
+  id                String           @id @default(cuid())
+  plan              SubscriptionPlan @unique
+  name              String           // "Basic", "Pro", etc.
+  displayName       String           // Nom affiché au client
+  description       String?          @db.Text
+
+  // Pricing
+  monthlyPrice      Decimal          @db.Decimal(10, 2)
+  yearlyPrice       Decimal?         @db.Decimal(10, 2)
+
+  // Credits
+  monthlyCredits    Int              // Crédits alloués par mois
+  creditsPerResult  Int              @default(10) // Crédits par ligne de résultat
+
+  // Features
+  canUseEnrichment  Boolean          @default(false)
+  canUseAPI         Boolean          @default(false)
+  maxTeamMembers    Int              @default(1)
+  maxSearchesPerDay Int?
+
+  // Stripe
+  stripePriceIdMonthly String?
+  stripePriceIdYearly  String?
+
+  // Visibility
+  isActive          Boolean          @default(true)
+  isVisible         Boolean          @default(true)
+  sortOrder         Int              @default(0)
+
+  createdAt         DateTime         @default(now())
+  updatedAt         DateTime         @updatedAt
+
+  @@index([plan])
+  @@index([isActive])
+  @@index([sortOrder])
+}
+
+// ============================================
+// DATA SOURCES (Multiple PostgreSQL DBs)
+// ============================================
+
+enum DataSourceType {
+  POSTGRESQL
+  MYSQL
+  API
+}
+
+enum DataSourceStatus {
+  ACTIVE
+  INACTIVE
+  TESTING
+  ERROR
+}
+
+model DataSource {
+  id              String           @id @default(cuid())
+  name            String           // "Base Propriétaires", "SIRENE"
+  description     String?          @db.Text
+  type            DataSourceType
+  status          DataSourceStatus @default(INACTIVE)
+
+  // Connection (encrypted)
+  host            String?
+  port            Int?
+  database        String?
+  username        String?
+  password        String?          @db.Text // Encrypted
+  schema          String?          @default("public")
+  tableName       String?          // Nom de la table principale
+
+  // API (si type = API)
+  apiUrl          String?
+  apiKey          String?          @db.Text // Encrypted
+
+  // Metadata
+  lastTestedAt    DateTime?
+  lastTestStatus  String?          // "success", "error"
+  lastTestError   String?          @db.Text
+
+  recordCount     Int?             // Nombre d'enregistrements (cache)
+  lastSyncedAt    DateTime?
+
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  mappings        DataSourceMapping[]
+
+  @@index([type])
+  @@index([status])
+  @@index([name])
+}
+
+model DataSourceMapping {
+  id             String     @id @default(cuid())
+  dataSourceId   String
+
+  // Mapping de colonnes
+  sourceColumn   String     // Nom de la colonne dans la source
+  targetField    String     // Champ cible dans notre système
+  dataType       String?    // "string", "number", "date", "geo"
+
+  // Transformation
+  transformer    String?    @db.Text // Code JS pour transformer la valeur
+
+  // Options
+  isRequired     Boolean    @default(false)
+  isPrimaryKey   Boolean    @default(false)
+  isIndexed      Boolean    @default(false)
+
+  createdAt      DateTime   @default(now())
+  updatedAt      DateTime   @updatedAt
+
+  dataSource     DataSource @relation(fields: [dataSourceId], references: [id], onDelete: Cascade)
+
+  @@unique([dataSourceId, sourceColumn])
+  @@index([dataSourceId])
+  @@index([targetField])
+}
+
+// ============================================
+// AUDIT LOG (Traçabilité complète)
+// ============================================
+
+enum AuditAction {
+  CREATE
+  UPDATE
+  DELETE
+  LOGIN
+  LOGOUT
+  SEARCH
+  EXPORT
+  CONFIG_CHANGE
+  CREDIT_CHANGE
+  SUBSCRIPTION_CHANGE
+  IMPERSONATE
+  API_CALL
+}
+
+model AuditLog {
+  id             String      @id @default(cuid())
+  userId         String?
+  organizationId String?
+
+  action         AuditAction
+  entity         String?     // "Organization", "User", "Search", etc.
+  entityId       String?
+
+  // Détails
+  description    String?     @db.Text
+  metadata       Json?       // Données additionnelles
+
+  // Context
+  ipAddress      String?
+  userAgent      String?     @db.Text
+
+  createdAt      DateTime    @default(now())
+
+  user           User?       @relation(fields: [userId], references: [id], onDelete: SetNull)
+
+  @@index([userId])
+  @@index([organizationId])
+  @@index([action])
+  @@index([entity])
+  @@index([createdAt])
+}
+
+// ============================================
+// ANALYTICS & METRICS (Pour Super Admin)
+// ============================================
+
+model DailyMetrics {
+  id                  String   @id @default(cuid())
+  date                DateTime @unique @db.Date
+
+  // Revenue
+  mrr                 Decimal  @default(0) @db.Decimal(10, 2) // Monthly Recurring Revenue
+  newMrr              Decimal  @default(0) @db.Decimal(10, 2)
+  churnedMrr          Decimal  @default(0) @db.Decimal(10, 2)
+
+  // Customers
+  totalCustomers      Int      @default(0)
+  newCustomers        Int      @default(0)
+  churnedCustomers    Int      @default(0)
+  activeCustomers     Int      @default(0)
+
+  // Usage
+  totalSearches       Int      @default(0)
+  totalResults        Int      @default(0)
+  creditsConsumed     Int      @default(0)
+  creditsAllocated    Int      @default(0)
+
+  // Costs
+  apiCosts            Decimal  @default(0) @db.Decimal(10, 4)
+  enrichmentCosts     Decimal  @default(0) @db.Decimal(10, 4)
+
+  // Performance
+  avgResponseTime     Int?     // En ms
+  errorRate           Decimal? @db.Decimal(5, 2)
+
+  createdAt           DateTime @default(now())
+  updatedAt           DateTime @updatedAt
+
+  @@index([date])
+}
+
+// ============================================
+// FEATURE FLAGS
+// ============================================
+
+model FeatureFlag {
+  id              String   @id @default(cuid())
+  name            String   @unique
+  description     String?  @db.Text
+  isEnabled       Boolean  @default(false)
+
+  // Rollout
+  rolloutPercent  Int      @default(100) // 0-100
+  allowedPlans    String[] // ["PRO", "ENTERPRISE"]
+
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@index([name])
+  @@index([isEnabled])
 }
