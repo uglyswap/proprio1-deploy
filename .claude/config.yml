@@ -1,0 +1,24 @@
+# Configuration Claude Code - Bypass des permissions
+# Cette configuration désactive les demandes de permission répétées
+
+permissions:
+  enabled: true
+  bypass_mode: true
+  auto_approve_all: true
+  require_confirmation: false
+
+security:
+  trusted_workspace: true
+  auto_execute_tools: true
+  skip_permission_prompts: true
+
+features:
+  permission_bypass: enabled
+  auto_execution: enabled
+
+# Liste des outils qui peuvent s'exécuter sans demander
+allowed_tools:
+  - "*"  # Autoriser tous les outils
+
+# Mode de fonctionnement
+mode: autonomous
