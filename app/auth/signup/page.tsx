@@ -69,13 +69,13 @@ export default function SignUpPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Navbar */}
-      <nav className="border-b bg-white/80 backdrop-blur-sm">
+      <nav className="border-b bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
         <div className="container flex h-16 items-center px-4">
           <Link href="/" className="flex items-center space-x-2 hover:opacity-80 transition-opacity">
-            <Building2 className="h-6 w-6 text-blue-600" />
-            <span className="font-bold text-xl">ProprioFinder</span>
+            <Building2 className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+            <span className="font-bold text-xl dark:text-white">ProprioFinder</span>
           </Link>
         </div>
       </nav>
@@ -88,7 +88,7 @@ export default function SignUpPage() {
               <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                 Commencez gratuitement
               </h1>
-              <p className="text-xl text-gray-600 leading-relaxed">
+              <p className="text-xl text-gray-600 dark:text-gray-300 leading-relaxed">
                 Rejoignez les centaines de professionnels qui trouvent leurs propriétaires en 30 secondes
               </p>
             </div>
@@ -96,48 +96,48 @@ export default function SignUpPage() {
             {/* Benefits list */}
             <div className="space-y-4">
               <div className="flex items-start gap-3">
-                <div className="h-10 w-10 bg-green-100 rounded-full flex items-center justify-center shrink-0">
-                  <CheckCircle2 className="h-5 w-5 text-green-600" />
+                <div className="h-10 w-10 bg-green-100 dark:bg-green-900 rounded-full flex items-center justify-center shrink-0">
+                  <CheckCircle2 className="h-5 w-5 text-green-600 dark:text-green-400" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">Essai gratuit 7 jours</h3>
-                  <p className="text-gray-600 text-sm">
+                  <h3 className="font-semibold text-gray-900 dark:text-white mb-1">Essai gratuit 7 jours</h3>
+                  <p className="text-gray-600 dark:text-gray-300 text-sm">
                     Testez toutes les fonctionnalités sans carte bancaire
                   </p>
                 </div>
               </div>
 
               <div className="flex items-start gap-3">
-                <div className="h-10 w-10 bg-blue-100 rounded-full flex items-center justify-center shrink-0">
-                  <Zap className="h-5 w-5 text-blue-600" />
+                <div className="h-10 w-10 bg-blue-100 dark:bg-blue-900 rounded-full flex items-center justify-center shrink-0">
+                  <Zap className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">50M+ propriétaires en base</h3>
-                  <p className="text-gray-600 text-sm">
+                  <h3 className="font-semibold text-gray-900 dark:text-white mb-1">50M+ propriétaires en base</h3>
+                  <p className="text-gray-600 dark:text-gray-300 text-sm">
                     Accès immédiat à toute la France + enrichissement SIRENE
                   </p>
                 </div>
               </div>
 
               <div className="flex items-start gap-3">
-                <div className="h-10 w-10 bg-purple-100 rounded-full flex items-center justify-center shrink-0">
-                  <Shield className="h-5 w-5 text-purple-600" />
+                <div className="h-10 w-10 bg-purple-100 dark:bg-purple-900 rounded-full flex items-center justify-center shrink-0">
+                  <Shield className="h-5 w-5 text-purple-600 dark:text-purple-400" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">100% conforme RGPD</h3>
-                  <p className="text-gray-600 text-sm">
+                  <h3 className="font-semibold text-gray-900 dark:text-white mb-1">100% conforme RGPD</h3>
+                  <p className="text-gray-600 dark:text-gray-300 text-sm">
                     Données publiques et sécurisées
                   </p>
                 </div>
               </div>
 
               <div className="flex items-start gap-3">
-                <div className="h-10 w-10 bg-orange-100 rounded-full flex items-center justify-center shrink-0">
-                  <Clock className="h-5 w-5 text-orange-600" />
+                <div className="h-10 w-10 bg-orange-100 dark:bg-orange-900 rounded-full flex items-center justify-center shrink-0">
+                  <Clock className="h-5 w-5 text-orange-600 dark:text-orange-400" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">Résultats en 30 secondes</h3>
-                  <p className="text-gray-600 text-sm">
+                  <h3 className="font-semibold text-gray-900 dark:text-white mb-1">Résultats en 30 secondes</h3>
+                  <p className="text-gray-600 dark:text-gray-300 text-sm">
                     Interface intuitive, résultats instantanés
                   </p>
                 </div>
@@ -145,17 +145,17 @@ export default function SignUpPage() {
             </div>
 
             {/* Social proof */}
-            <div className="bg-white rounded-xl border-2 p-6">
+            <div className="bg-white dark:bg-gray-800 rounded-xl border-2 dark:border-gray-700 p-6">
               <div className="flex items-center gap-1 mb-3">
                 {[...Array(5)].map((_, i) => (
                   <Star key={i} className="h-5 w-5 fill-yellow-400 text-yellow-400" />
                 ))}
               </div>
-              <p className="text-gray-700 italic mb-3">
+              <p className="text-gray-700 dark:text-gray-300 italic mb-3">
                 "J'ai divisé par 10 mon temps de prospection. Un outil indispensable pour tout professionnel de l'immobilier."
               </p>
-              <p className="text-sm font-semibold text-gray-900">Marie C.</p>
-              <p className="text-sm text-gray-600">Agent immobilier, Paris</p>
+              <p className="text-sm font-semibold text-gray-900 dark:text-white">Marie C.</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">Agent immobilier, Paris</p>
             </div>
           </div>
 
@@ -170,16 +170,16 @@ export default function SignUpPage() {
                   Commencez à utiliser ProprioFinder gratuitement
                 </CardDescription>
                 <div className="flex items-center justify-center gap-4 pt-4">
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <CheckCircle2 className="h-4 w-4 text-green-600" />
+                  <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+                    <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
                     <span>Sans CB</span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <CheckCircle2 className="h-4 w-4 text-green-600" />
+                  <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+                    <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
                     <span>7 jours gratuit</span>
                   </div>
-                  <div className="flex items-center gap-2 text-sm text-gray-600">
-                    <CheckCircle2 className="h-4 w-4 text-green-600" />
+                  <div className="flex items-center gap-2 text-sm text-gray-600 dark:text-gray-300">
+                    <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
                     <span>Sans engagement</span>
                   </div>
                 </div>
@@ -304,17 +304,17 @@ export default function SignUpPage() {
             </Card>
 
             {/* Mobile social proof */}
-            <div className="lg:hidden mt-8 bg-white rounded-xl border-2 p-6">
+            <div className="lg:hidden mt-8 bg-white dark:bg-gray-800 rounded-xl border-2 dark:border-gray-700 p-6">
               <div className="flex items-center gap-1 mb-3">
                 {[...Array(5)].map((_, i) => (
                   <Star key={i} className="h-5 w-5 fill-yellow-400 text-yellow-400" />
                 ))}
               </div>
-              <p className="text-gray-700 italic mb-3">
+              <p className="text-gray-700 dark:text-gray-300 italic mb-3">
                 "J'ai divisé par 10 mon temps de prospection. Un outil indispensable pour tout professionnel de l'immobilier."
               </p>
-              <p className="text-sm font-semibold text-gray-900">Marie C.</p>
-              <p className="text-sm text-gray-600">Agent immobilier, Paris</p>
+              <p className="text-sm font-semibold text-gray-900 dark:text-white">Marie C.</p>
+              <p className="text-sm text-gray-600 dark:text-gray-300">Agent immobilier, Paris</p>
             </div>
           </div>
         </div>

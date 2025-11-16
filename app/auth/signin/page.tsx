@@ -48,13 +48,13 @@ export default function SignInPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
+    <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Navbar */}
-      <nav className="border-b bg-white/80 backdrop-blur-sm">
+      <nav className="border-b bg-white/80 dark:bg-gray-900/80 backdrop-blur-sm">
         <div className="container flex h-16 items-center px-4">
           <Link href="/" className="flex items-center space-x-2 hover:opacity-80 transition-opacity">
-            <Building2 className="h-6 w-6 text-blue-600" />
-            <span className="font-bold text-xl">ProprioFinder</span>
+            <Building2 className="h-6 w-6 text-blue-600 dark:text-blue-400" />
+            <span className="font-bold text-xl dark:text-white">ProprioFinder</span>
           </Link>
         </div>
       </nav>
@@ -67,60 +67,60 @@ export default function SignInPage() {
               <h1 className="text-4xl md:text-5xl font-bold mb-4 bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
                 Content de vous revoir !
               </h1>
-              <p className="text-xl text-gray-600 leading-relaxed">
+              <p className="text-xl text-gray-600 dark:text-gray-300 leading-relaxed">
                 Accédez à votre dashboard et continuez à trouver vos propriétaires en un clic
               </p>
             </div>
 
             {/* Quick stats */}
             <div className="grid grid-cols-2 gap-4">
-              <div className="bg-white rounded-xl border-2 p-4">
-                <div className="text-3xl font-bold text-blue-600 mb-1">50M+</div>
-                <div className="text-sm text-gray-600">Biens en base</div>
+              <div className="bg-white dark:bg-gray-800 rounded-xl border-2 dark:border-gray-700 p-4">
+                <div className="text-3xl font-bold text-blue-600 dark:text-blue-400 mb-1">50M+</div>
+                <div className="text-sm text-gray-600 dark:text-gray-300">Biens en base</div>
               </div>
-              <div className="bg-white rounded-xl border-2 p-4">
-                <div className="text-3xl font-bold text-purple-600 mb-1">2.4M+</div>
-                <div className="text-sm text-gray-600">Entreprises SIRENE</div>
+              <div className="bg-white dark:bg-gray-800 rounded-xl border-2 dark:border-gray-700 p-4">
+                <div className="text-3xl font-bold text-purple-600 dark:text-purple-400 mb-1">2.4M+</div>
+                <div className="text-sm text-gray-600 dark:text-gray-300">Entreprises SIRENE</div>
               </div>
-              <div className="bg-white rounded-xl border-2 p-4">
-                <div className="text-3xl font-bold text-green-600 mb-1">98%</div>
-                <div className="text-sm text-gray-600">Taux de réussite</div>
+              <div className="bg-white dark:bg-gray-800 rounded-xl border-2 dark:border-gray-700 p-4">
+                <div className="text-3xl font-bold text-green-600 dark:text-green-400 mb-1">98%</div>
+                <div className="text-sm text-gray-600 dark:text-gray-300">Taux de réussite</div>
               </div>
-              <div className="bg-white rounded-xl border-2 p-4">
-                <div className="text-3xl font-bold text-orange-600 mb-1">30s</div>
-                <div className="text-sm text-gray-600">Temps moyen</div>
+              <div className="bg-white dark:bg-gray-800 rounded-xl border-2 dark:border-gray-700 p-4">
+                <div className="text-3xl font-bold text-orange-600 dark:text-orange-400 mb-1">30s</div>
+                <div className="text-sm text-gray-600 dark:text-gray-300">Temps moyen</div>
               </div>
             </div>
 
             {/* Features reminder */}
             <div className="space-y-3">
-              <div className="flex items-center gap-3 p-3 bg-white rounded-lg border">
-                <div className="h-10 w-10 bg-blue-100 rounded-lg flex items-center justify-center">
-                  <Zap className="h-5 w-5 text-blue-600" />
+              <div className="flex items-center gap-3 p-3 bg-white dark:bg-gray-800 rounded-lg border dark:border-gray-700">
+                <div className="h-10 w-10 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center">
+                  <Zap className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                 </div>
                 <div>
-                  <div className="font-semibold text-gray-900">Recherche instantanée</div>
-                  <div className="text-sm text-gray-600">Par adresse, propriétaire ou zone</div>
+                  <div className="font-semibold text-gray-900 dark:text-white">Recherche instantanée</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-300">Par adresse, propriétaire ou zone</div>
                 </div>
               </div>
 
-              <div className="flex items-center gap-3 p-3 bg-white rounded-lg border">
-                <div className="h-10 w-10 bg-purple-100 rounded-lg flex items-center justify-center">
-                  <Database className="h-5 w-5 text-purple-600" />
+              <div className="flex items-center gap-3 p-3 bg-white dark:bg-gray-800 rounded-lg border dark:border-gray-700">
+                <div className="h-10 w-10 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center">
+                  <Database className="h-5 w-5 text-purple-600 dark:text-purple-400" />
                 </div>
                 <div>
-                  <div className="font-semibold text-gray-900">Enrichissement automatique</div>
-                  <div className="text-sm text-gray-600">SIRENE, Pappers, Cadastre, DVF</div>
+                  <div className="font-semibold text-gray-900 dark:text-white">Enrichissement automatique</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-300">SIRENE, Pappers, Cadastre, DVF</div>
                 </div>
               </div>
 
-              <div className="flex items-center gap-3 p-3 bg-white rounded-lg border">
-                <div className="h-10 w-10 bg-green-100 rounded-lg flex items-center justify-center">
-                  <TrendingUp className="h-5 w-5 text-green-600" />
+              <div className="flex items-center gap-3 p-3 bg-white dark:bg-gray-800 rounded-lg border dark:border-gray-700">
+                <div className="h-10 w-10 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center">
+                  <TrendingUp className="h-5 w-5 text-green-600 dark:text-green-400" />
                 </div>
                 <div>
-                  <div className="font-semibold text-gray-900">Analytics avancé</div>
-                  <div className="text-sm text-gray-600">Suivez votre utilisation en temps réel</div>
+                  <div className="font-semibold text-gray-900 dark:text-white">Analytics avancé</div>
+                  <div className="text-sm text-gray-600 dark:text-gray-300">Suivez votre utilisation en temps réel</div>
                 </div>
               </div>
             </div>
@@ -207,14 +207,14 @@ export default function SignInPage() {
                     </Link>
                   </div>
 
-                  <div className="pt-4 border-t">
-                    <div className="flex items-center justify-center gap-4 text-xs text-gray-600">
+                  <div className="pt-4 border-t dark:border-gray-700">
+                    <div className="flex items-center justify-center gap-4 text-xs text-gray-600 dark:text-gray-300">
                       <div className="flex items-center gap-1">
-                        <CheckCircle2 className="h-3 w-3 text-green-600" />
+                        <CheckCircle2 className="h-3 w-3 text-green-600 dark:text-green-400" />
                         <span>Essai gratuit 7 jours</span>
                       </div>
                       <div className="flex items-center gap-1">
-                        <CheckCircle2 className="h-3 w-3 text-green-600" />
+                        <CheckCircle2 className="h-3 w-3 text-green-600 dark:text-green-400" />
                         <span>Sans carte bancaire</span>
                       </div>
                     </div>
@@ -225,13 +225,13 @@ export default function SignInPage() {
 
             {/* Mobile quick stats */}
             <div className="lg:hidden mt-8 grid grid-cols-2 gap-4">
-              <div className="bg-white rounded-xl border-2 p-4 text-center">
-                <div className="text-2xl font-bold text-blue-600 mb-1">50M+</div>
-                <div className="text-xs text-gray-600">Biens en base</div>
+              <div className="bg-white dark:bg-gray-800 rounded-xl border-2 dark:border-gray-700 p-4 text-center">
+                <div className="text-2xl font-bold text-blue-600 dark:text-blue-400 mb-1">50M+</div>
+                <div className="text-xs text-gray-600 dark:text-gray-300">Biens en base</div>
               </div>
-              <div className="lg:hidden bg-white rounded-xl border-2 p-4 text-center">
-                <div className="text-2xl font-bold text-green-600 mb-1">98%</div>
-                <div className="text-xs text-gray-600">Taux de réussite</div>
+              <div className="lg:hidden bg-white dark:bg-gray-800 rounded-xl border-2 dark:border-gray-700 p-4 text-center">
+                <div className="text-2xl font-bold text-green-600 dark:text-green-400 mb-1">98%</div>
+                <div className="text-xs text-gray-600 dark:text-gray-300">Taux de réussite</div>
               </div>
             </div>
           </div>

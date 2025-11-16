@@ -106,16 +106,16 @@ export default function Home() {
         </section>
 
         {/* AIDA: INTEREST - How it works / Features with benefits */}
-        <section id="features" className="py-20 bg-gradient-to-b from-white to-gray-50">
+        <section id="features" className="py-20 bg-gradient-to-b from-white to-gray-50 dark:from-gray-900 dark:to-gray-800">
           <div className="container mx-auto px-4">
             <div className="text-center max-w-3xl mx-auto mb-16">
               <Badge className="mb-4" variant="outline">
                 Fonctionnalités
               </Badge>
-              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
                 3 façons de trouver vos propriétaires
               </h2>
-              <p className="text-xl text-gray-600">
+              <p className="text-xl text-gray-600 dark:text-gray-300">
                 Choisissez votre méthode de recherche. Obtenez les résultats en quelques secondes.
               </p>
             </div>
@@ -212,42 +212,42 @@ export default function Home() {
             {/* Additional benefits */}
             <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
               <div className="flex items-start gap-4">
-                <div className="h-10 w-10 bg-blue-100 rounded-lg flex items-center justify-center shrink-0">
-                  <Database className="h-5 w-5 text-blue-600" />
+                <div className="h-10 w-10 bg-blue-100 dark:bg-blue-900 rounded-lg flex items-center justify-center shrink-0">
+                  <Database className="h-5 w-5 text-blue-600 dark:text-blue-400" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">Données toujours à jour</h3>
-                  <p className="text-sm text-gray-600">Base mise à jour quotidiennement</p>
+                  <h3 className="font-semibold text-gray-900 dark:text-white mb-1">Données toujours à jour</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">Base mise à jour quotidiennement</p>
                 </div>
               </div>
 
               <div className="flex items-start gap-4">
-                <div className="h-10 w-10 bg-purple-100 rounded-lg flex items-center justify-center shrink-0">
-                  <Download className="h-5 w-5 text-purple-600" />
+                <div className="h-10 w-10 bg-purple-100 dark:bg-purple-900 rounded-lg flex items-center justify-center shrink-0">
+                  <Download className="h-5 w-5 text-purple-600 dark:text-purple-400" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">Export instantané</h3>
-                  <p className="text-sm text-gray-600">CSV avec tous les liens enrichis</p>
+                  <h3 className="font-semibold text-gray-900 dark:text-white mb-1">Export instantané</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">CSV avec tous les liens enrichis</p>
                 </div>
               </div>
 
               <div className="flex items-start gap-4">
-                <div className="h-10 w-10 bg-green-100 rounded-lg flex items-center justify-center shrink-0">
-                  <Shield className="h-5 w-5 text-green-600" />
+                <div className="h-10 w-10 bg-green-100 dark:bg-green-900 rounded-lg flex items-center justify-center shrink-0">
+                  <Shield className="h-5 w-5 text-green-600 dark:text-green-400" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">100% conforme RGPD</h3>
-                  <p className="text-sm text-gray-600">Données publiques et légales</p>
+                  <h3 className="font-semibold text-gray-900 dark:text-white mb-1">100% conforme RGPD</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">Données publiques et légales</p>
                 </div>
               </div>
 
               <div className="flex items-start gap-4">
-                <div className="h-10 w-10 bg-orange-100 rounded-lg flex items-center justify-center shrink-0">
-                  <Zap className="h-5 w-5 text-orange-600" />
+                <div className="h-10 w-10 bg-orange-100 dark:bg-orange-900 rounded-lg flex items-center justify-center shrink-0">
+                  <Zap className="h-5 w-5 text-orange-600 dark:text-orange-400" />
                 </div>
                 <div>
-                  <h3 className="font-semibold text-gray-900 mb-1">Résultats en 30s</h3>
-                  <p className="text-sm text-gray-600">Infrastructure ultra-rapide</p>
+                  <h3 className="font-semibold text-gray-900 dark:text-white mb-1">Résultats en 30s</h3>
+                  <p className="text-sm text-gray-600 dark:text-gray-300">Infrastructure ultra-rapide</p>
                 </div>
               </div>
             </div>
@@ -255,16 +255,16 @@ export default function Home() {
         </section>
 
         {/* AIDA: DESIRE - Social proof / Testimonials */}
-        <section className="py-20 bg-white">
+        <section className="py-20 bg-white dark:bg-gray-900">
           <div className="container mx-auto px-4">
             <div className="text-center max-w-3xl mx-auto mb-16">
               <Badge className="mb-4" variant="outline">
                 Témoignages
               </Badge>
-              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
                 Ils nous font confiance
               </h2>
-              <p className="text-xl text-gray-600">
+              <p className="text-xl text-gray-600 dark:text-gray-300">
                 Des professionnels de l'immobilier qui ont transformé leur prospection
               </p>
             </div>
@@ -278,7 +278,7 @@ export default function Home() {
                       <Star key={i} className="h-5 w-5 fill-yellow-400 text-yellow-400" />
                     ))}
                   </div>
-                  <p className="text-gray-700 mb-6 italic">
+                  <p className="text-gray-700 dark:text-gray-300 mb-6 italic">
                     "J'ai divisé par 10 mon temps de prospection. Je trouve les propriétaires en quelques secondes au lieu de plusieurs heures. Un outil indispensable !"
                   </p>
                   <div className="flex items-center gap-3">
@@ -286,8 +286,8 @@ export default function Home() {
                       <AvatarFallback className="bg-blue-600 text-white">MC</AvatarFallback>
                     </Avatar>
                     <div>
-                      <div className="font-semibold">Marie Clement</div>
-                      <div className="text-sm text-gray-600">Agent immobilier, Paris</div>
+                      <div className="font-semibold dark:text-white">Marie Clement</div>
+                      <div className="text-sm text-gray-600 dark:text-gray-400">Agent immobilier, Paris</div>
                     </div>
                   </div>
                 </CardContent>
@@ -301,7 +301,7 @@ export default function Home() {
                       <Star key={i} className="h-5 w-5 fill-yellow-400 text-yellow-400" />
                     ))}
                   </div>
-                  <p className="text-gray-700 mb-6 italic">
+                  <p className="text-gray-700 dark:text-gray-300 mb-6 italic">
                     "La qualité des données est exceptionnelle. Emails vérifiés, liens directs vers Pappers... C'est du temps précieux gagné sur chaque dossier."
                   </p>
                   <div className="flex items-center gap-3">
@@ -309,8 +309,8 @@ export default function Home() {
                       <AvatarFallback className="bg-purple-600 text-white">JD</AvatarFallback>
                     </Avatar>
                     <div>
-                      <div className="font-semibold">Jean Dupont</div>
-                      <div className="text-sm text-gray-600">Promoteur immobilier, Lyon</div>
+                      <div className="font-semibold dark:text-white">Jean Dupont</div>
+                      <div className="text-sm text-gray-600 dark:text-gray-400">Promoteur immobilier, Lyon</div>
                     </div>
                   </div>
                 </CardContent>
@@ -324,7 +324,7 @@ export default function Home() {
                       <Star key={i} className="h-5 w-5 fill-yellow-400 text-yellow-400" />
                     ))}
                   </div>
-                  <p className="text-gray-700 mb-6 italic">
+                  <p className="text-gray-700 dark:text-gray-300 mb-6 italic">
                     "L'export CSV est parfait. Je récupère toutes mes données en un clic et j'intègre directement dans mon CRM. Exactement ce dont j'avais besoin."
                   </p>
                   <div className="flex items-center gap-3">
@@ -332,8 +332,8 @@ export default function Home() {
                       <AvatarFallback className="bg-green-600 text-white">SL</AvatarFallback>
                     </Avatar>
                     <div>
-                      <div className="font-semibold">Sophie Leroy</div>
-                      <div className="text-sm text-gray-600">Gestionnaire de patrimoine, Bordeaux</div>
+                      <div className="font-semibold dark:text-white">Sophie Leroy</div>
+                      <div className="text-sm text-gray-600 dark:text-gray-400">Gestionnaire de patrimoine, Bordeaux</div>
                     </div>
                   </div>
                 </CardContent>
@@ -343,27 +343,27 @@ export default function Home() {
         </section>
 
         {/* Pricing teaser */}
-        <section className="py-20 bg-gradient-to-b from-gray-50 to-white">
+        <section className="py-20 bg-gradient-to-b from-gray-50 to-white dark:from-gray-800 dark:to-gray-900">
           <div className="container mx-auto px-4">
             <div className="text-center max-w-3xl mx-auto mb-12">
               <Badge className="mb-4" variant="outline">
                 Tarification
               </Badge>
-              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
                 Un prix juste et transparent
               </h2>
-              <p className="text-xl text-gray-600">
+              <p className="text-xl text-gray-600 dark:text-gray-300">
                 Payez uniquement pour les résultats que vous validez. Sans engagement.
               </p>
             </div>
 
             <div className="max-w-4xl mx-auto">
               <div className="grid md:grid-cols-3 gap-6 mb-8">
-                <div className="bg-white border-2 rounded-lg p-6 text-center">
-                  <div className="text-4xl font-bold text-blue-600 mb-2">€29</div>
-                  <div className="text-gray-600 mb-4">/mois</div>
-                  <div className="text-2xl font-semibold mb-2">500 crédits</div>
-                  <div className="text-sm text-gray-500">Soit ~50 résultats/mois</div>
+                <div className="bg-white dark:bg-gray-800 border-2 dark:border-gray-700 rounded-lg p-6 text-center">
+                  <div className="text-4xl font-bold text-blue-600 dark:text-blue-400 mb-2">€29</div>
+                  <div className="text-gray-600 dark:text-gray-300 mb-4">/mois</div>
+                  <div className="text-2xl font-semibold dark:text-white mb-2">500 crédits</div>
+                  <div className="text-sm text-gray-500 dark:text-gray-400">Soit ~50 résultats/mois</div>
                 </div>
 
                 <div className="bg-gradient-to-br from-blue-600 to-purple-700 text-white border-2 border-blue-600 rounded-lg p-6 text-center relative transform scale-105 shadow-xl">
@@ -376,11 +376,11 @@ export default function Home() {
                   <div className="text-sm text-blue-100">Soit ~200 résultats/mois</div>
                 </div>
 
-                <div className="bg-white border-2 rounded-lg p-6 text-center">
-                  <div className="text-4xl font-bold text-blue-600 mb-2">€349</div>
-                  <div className="text-gray-600 mb-4">/mois</div>
-                  <div className="text-2xl font-semibold mb-2">10000 crédits</div>
-                  <div className="text-sm text-gray-500">Soit ~1000 résultats/mois</div>
+                <div className="bg-white dark:bg-gray-800 border-2 dark:border-gray-700 rounded-lg p-6 text-center">
+                  <div className="text-4xl font-bold text-blue-600 dark:text-blue-400 mb-2">€349</div>
+                  <div className="text-gray-600 dark:text-gray-300 mb-4">/mois</div>
+                  <div className="text-2xl font-semibold dark:text-white mb-2">10000 crédits</div>
+                  <div className="text-sm text-gray-500 dark:text-gray-400">Soit ~1000 résultats/mois</div>
                 </div>
               </div>
 
@@ -391,7 +391,7 @@ export default function Home() {
                     <ArrowRight className="ml-2 h-5 w-5" />
                   </Link>
                 </Button>
-                <p className="text-sm text-gray-500 mt-4">
+                <p className="text-sm text-gray-500 dark:text-gray-400 mt-4">
                   10 crédits = 1 résultat • Crédits réinitialisés chaque mois • Aucun engagement
                 </p>
               </div>
@@ -400,79 +400,79 @@ export default function Home() {
         </section>
 
         {/* FAQ Section */}
-        <section id="faq" className="py-20 bg-white">
+        <section id="faq" className="py-20 bg-white dark:bg-gray-900">
           <div className="container mx-auto px-4">
             <div className="text-center max-w-3xl mx-auto mb-16">
               <Badge className="mb-4" variant="outline">
                 FAQ
               </Badge>
-              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 mb-4">
+              <h2 className="text-4xl md:text-5xl font-bold text-gray-900 dark:text-white mb-4">
                 Questions fréquentes
               </h2>
-              <p className="text-xl text-gray-600">
+              <p className="text-xl text-gray-600 dark:text-gray-300">
                 Tout ce que vous devez savoir sur ProprioFinder
               </p>
             </div>
 
             <div className="max-w-3xl mx-auto">
               <Accordion type="single" collapsible className="space-y-4">
-                <AccordionItem value="item-1" className="border rounded-lg px-6">
-                  <AccordionTrigger className="text-left font-semibold">
+                <AccordionItem value="item-1" className="border rounded-lg px-6 dark:border-gray-700">
+                  <AccordionTrigger className="text-left font-semibold dark:text-white">
                     Comment fonctionne le système de crédits ?
                   </AccordionTrigger>
-                  <AccordionContent className="text-gray-600">
+                  <AccordionContent className="text-gray-600 dark:text-gray-300">
                     Vous achetez des crédits selon votre formule. 10 crédits = 1 résultat validé.
                     Vous ne payez que pour les résultats que vous choisissez de consulter.
                     Les crédits non utilisés ne sont pas reportés d'un mois à l'autre.
                   </AccordionContent>
                 </AccordionItem>
 
-                <AccordionItem value="item-2" className="border rounded-lg px-6">
-                  <AccordionTrigger className="text-left font-semibold">
+                <AccordionItem value="item-2" className="border rounded-lg px-6 dark:border-gray-700">
+                  <AccordionTrigger className="text-left font-semibold dark:text-white">
                     D'où viennent les données ?
                   </AccordionTrigger>
-                  <AccordionContent className="text-gray-600">
+                  <AccordionContent className="text-gray-600 dark:text-gray-300">
                     Nous agrégeons des données publiques issues des fichiers fonciers (DGFiP),
                     du cadastre, de DVF et de la base SIRENE. Toutes nos données sont 100% légales et conformes RGPD.
                   </AccordionContent>
                 </AccordionItem>
 
-                <AccordionItem value="item-3" className="border rounded-lg px-6">
-                  <AccordionTrigger className="text-left font-semibold">
+                <AccordionItem value="item-3" className="border rounded-lg px-6 dark:border-gray-700">
+                  <AccordionTrigger className="text-left font-semibold dark:text-white">
                     Quelle est la fiabilité des coordonnées ?
                   </AccordionTrigger>
-                  <AccordionContent className="text-gray-600">
+                  <AccordionContent className="text-gray-600 dark:text-gray-300">
                     Nous enrichissons les données avec plusieurs sources (Pappers, SIRENE) pour garantir
                     un taux de fiabilité de 98%. Les emails et téléphones sont vérifiés et mis à jour quotidiennement.
                   </AccordionContent>
                 </AccordionItem>
 
-                <AccordionItem value="item-4" className="border rounded-lg px-6">
-                  <AccordionTrigger className="text-left font-semibold">
+                <AccordionItem value="item-4" className="border rounded-lg px-6 dark:border-gray-700">
+                  <AccordionTrigger className="text-left font-semibold dark:text-white">
                     Puis-je annuler mon abonnement à tout moment ?
                   </AccordionTrigger>
-                  <AccordionContent className="text-gray-600">
+                  <AccordionContent className="text-gray-600 dark:text-gray-300">
                     Oui, absolument. Vous pouvez annuler votre abonnement en 1 clic depuis votre dashboard.
                     Aucun engagement, aucune question posée. Vous gardez accès jusqu'à la fin de votre période payée.
                   </AccordionContent>
                 </AccordionItem>
 
-                <AccordionItem value="item-5" className="border rounded-lg px-6">
-                  <AccordionTrigger className="text-left font-semibold">
+                <AccordionItem value="item-5" className="border rounded-lg px-6 dark:border-gray-700">
+                  <AccordionTrigger className="text-left font-semibold dark:text-white">
                     Comment fonctionne l'essai gratuit ?
                   </AccordionTrigger>
-                  <AccordionContent className="text-gray-600">
+                  <AccordionContent className="text-gray-600 dark:text-gray-300">
                     L'essai gratuit vous donne accès à toutes les fonctionnalités pendant 7 jours.
                     Aucune carte bancaire n'est requise à l'inscription. Vous pourrez effectuer des recherches
                     et découvrir la plateforme sans aucun engagement.
                   </AccordionContent>
                 </AccordionItem>
 
-                <AccordionItem value="item-6" className="border rounded-lg px-6">
-                  <AccordionTrigger className="text-left font-semibold">
+                <AccordionItem value="item-6" className="border rounded-lg px-6 dark:border-gray-700">
+                  <AccordionTrigger className="text-left font-semibold dark:text-white">
                     Quelle couverture géographique ?
                   </AccordionTrigger>
-                  <AccordionContent className="text-gray-600">
+                  <AccordionContent className="text-gray-600 dark:text-gray-300">
                     ProprioFinder couvre l'intégralité du territoire français avec plus de 50 millions de biens
                     immobiliers référencés. DOM-TOM inclus.
                   </AccordionContent>

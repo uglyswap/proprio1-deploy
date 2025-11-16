@@ -100,26 +100,26 @@ export default function PricingPage() {
   return (
     <>
       <Navbar />
-      <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white py-20">
+      <div className="min-h-screen bg-gradient-to-b from-white via-gray-50 to-white dark:from-gray-900 dark:via-gray-800 dark:to-gray-900 py-20">
         <div className="container mx-auto px-4">
           {/* AIDA: ATTENTION - Header with emotional appeal */}
           <div className="text-center max-w-4xl mx-auto mb-16">
-            <Badge className="mb-4 bg-blue-100 text-blue-700 hover:bg-blue-200">
+            <Badge className="mb-4 bg-blue-100 dark:bg-blue-900 text-blue-700 dark:text-blue-300 hover:bg-blue-200 dark:hover:bg-blue-800">
               <Zap className="h-3 w-3 mr-1" />
               Tarification transparente
             </Badge>
-            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 bg-gradient-to-r from-gray-900 to-gray-600 bg-clip-text text-transparent">
+            <h1 className="text-4xl md:text-5xl lg:text-6xl font-bold mb-6 bg-gradient-to-r from-gray-900 to-gray-600 dark:from-white dark:to-gray-300 bg-clip-text text-transparent">
               Un prix juste qui s'adapte à votre activité
             </h1>
-            <p className="text-xl md:text-2xl text-gray-600 mb-8 leading-relaxed">
+            <p className="text-xl md:text-2xl text-gray-600 dark:text-gray-300 mb-8 leading-relaxed">
               Payez uniquement pour les résultats que vous validez.
-              <span className="block mt-2 font-semibold text-gray-900">
+              <span className="block mt-2 font-semibold text-gray-900 dark:text-white">
                 Aucun engagement • Annulation en 1 clic • Essai gratuit 7 jours
               </span>
             </p>
 
             {/* Trust badges */}
-            <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-gray-600">
+            <div className="flex flex-wrap items-center justify-center gap-6 text-sm text-gray-600 dark:text-gray-300">
               <div className="flex items-center gap-2">
                 <Shield className="h-5 w-5 text-green-600" />
                 <span>Paiement sécurisé</span>
@@ -136,14 +136,14 @@ export default function PricingPage() {
           </div>
 
           {/* Pricing explanation */}
-          <div className="max-w-2xl mx-auto mb-12 bg-blue-50 border-2 border-blue-200 rounded-xl p-6 text-center">
-            <h3 className="text-lg font-semibold text-blue-900 mb-2">
+          <div className="max-w-2xl mx-auto mb-12 bg-blue-50 dark:bg-blue-950 border-2 border-blue-200 dark:border-blue-800 rounded-xl p-6 text-center">
+            <h3 className="text-lg font-semibold text-blue-900 dark:text-blue-100 mb-2">
               Comment fonctionne la tarification ?
             </h3>
-            <p className="text-blue-800 text-lg">
+            <p className="text-blue-800 dark:text-blue-200 text-lg">
               <span className="font-bold text-2xl">10 crédits = 1 résultat validé</span>
             </p>
-            <p className="text-blue-700 mt-2 text-sm">
+            <p className="text-blue-700 dark:text-blue-300 mt-2 text-sm">
               Vous visualisez d'abord une estimation gratuite, puis vous ne payez que si vous validez le résultat.
               Les crédits non utilisés sont réinitialisés chaque mois.
             </p>
@@ -169,21 +169,21 @@ export default function PricingPage() {
                 )}
 
                 <CardHeader className={plan.popular ? 'pb-4' : ''}>
-                  <CardTitle className="text-3xl font-bold">{plan.name}</CardTitle>
-                  <CardDescription className="text-base">{plan.description}</CardDescription>
+                  <CardTitle className="text-3xl font-bold dark:text-white">{plan.name}</CardTitle>
+                  <CardDescription className="text-base dark:text-gray-300">{plan.description}</CardDescription>
                   <div className="mt-6">
                     <div className="flex items-baseline gap-2">
-                      <span className="text-5xl font-bold text-gray-900">{plan.price}€</span>
-                      <span className="text-gray-500 text-lg">/mois</span>
+                      <span className="text-5xl font-bold text-gray-900 dark:text-white">{plan.price}€</span>
+                      <span className="text-gray-500 dark:text-gray-400 text-lg">/mois</span>
                     </div>
                     <div className="mt-3 space-y-1">
-                      <div className="text-lg font-semibold text-blue-600">
+                      <div className="text-lg font-semibold text-blue-600 dark:text-blue-400">
                         {plan.credits.toLocaleString('fr-FR')} crédits
                       </div>
-                      <div className="text-sm text-gray-600">
+                      <div className="text-sm text-gray-600 dark:text-gray-300">
                         Soit environ {plan.results} résultats/mois
                       </div>
-                      <div className="text-xs text-gray-500 mt-2">
+                      <div className="text-xs text-gray-500 dark:text-gray-400 mt-2">
                         + {plan.extraCost}€/résultat supplémentaire
                       </div>
                     </div>
@@ -194,8 +194,8 @@ export default function PricingPage() {
                   <ul className="space-y-3">
                     {plan.features.map((feature) => (
                       <li key={feature} className="flex items-start gap-3">
-                        <Check className="h-5 w-5 text-green-600 flex-shrink-0 mt-0.5" />
-                        <span className="text-sm text-gray-700">{feature}</span>
+                        <Check className="h-5 w-5 text-green-600 dark:text-green-400 flex-shrink-0 mt-0.5" />
+                        <span className="text-sm text-gray-700 dark:text-gray-300">{feature}</span>
                       </li>
                     ))}
                   </ul>
@@ -232,73 +232,73 @@ export default function PricingPage() {
           {/* AIDA: DESIRE - Comparison table */}
           <div className="max-w-5xl mx-auto mb-20">
             <div className="text-center mb-12">
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
                 Comparez les fonctionnalités
               </h2>
-              <p className="text-lg text-gray-600">
+              <p className="text-lg text-gray-600 dark:text-gray-300">
                 Choisissez le plan qui correspond le mieux à vos besoins
               </p>
             </div>
 
-            <div className="bg-white rounded-xl border-2 overflow-hidden">
+            <div className="bg-white dark:bg-gray-800 rounded-xl border-2 dark:border-gray-700 overflow-hidden">
               <div className="overflow-x-auto">
                 <table className="w-full">
-                  <thead className="bg-gray-50 border-b-2">
+                  <thead className="bg-gray-50 dark:bg-gray-900 border-b-2 dark:border-gray-700">
                     <tr>
-                      <th className="text-left py-4 px-6 font-semibold text-gray-900">Fonctionnalité</th>
-                      <th className="text-center py-4 px-6 font-semibold text-gray-900">Basic</th>
-                      <th className="text-center py-4 px-6 font-semibold text-gray-900 bg-blue-50">Pro</th>
-                      <th className="text-center py-4 px-6 font-semibold text-gray-900">Enterprise</th>
+                      <th className="text-left py-4 px-6 font-semibold text-gray-900 dark:text-white">Fonctionnalité</th>
+                      <th className="text-center py-4 px-6 font-semibold text-gray-900 dark:text-white">Basic</th>
+                      <th className="text-center py-4 px-6 font-semibold text-gray-900 dark:text-white bg-blue-50 dark:bg-blue-950">Pro</th>
+                      <th className="text-center py-4 px-6 font-semibold text-gray-900 dark:text-white">Enterprise</th>
                     </tr>
                   </thead>
-                  <tbody className="divide-y">
+                  <tbody className="divide-y dark:divide-gray-700">
                     <tr>
-                      <td className="py-4 px-6 font-medium text-gray-900">Crédits mensuels</td>
-                      <td className="text-center py-4 px-6">500</td>
-                      <td className="text-center py-4 px-6 bg-blue-50">2 000</td>
-                      <td className="text-center py-4 px-6">10 000</td>
+                      <td className="py-4 px-6 font-medium text-gray-900 dark:text-white">Crédits mensuels</td>
+                      <td className="text-center py-4 px-6 dark:text-gray-300">500</td>
+                      <td className="text-center py-4 px-6 bg-blue-50 dark:bg-blue-950 dark:text-gray-300">2 000</td>
+                      <td className="text-center py-4 px-6 dark:text-gray-300">10 000</td>
                     </tr>
                     <tr>
-                      <td className="py-4 px-6 font-medium text-gray-900">Résultats environ</td>
-                      <td className="text-center py-4 px-6">~50/mois</td>
-                      <td className="text-center py-4 px-6 bg-blue-50">~200/mois</td>
-                      <td className="text-center py-4 px-6">~1000/mois</td>
+                      <td className="py-4 px-6 font-medium text-gray-900 dark:text-white">Résultats environ</td>
+                      <td className="text-center py-4 px-6 dark:text-gray-300">~50/mois</td>
+                      <td className="text-center py-4 px-6 bg-blue-50 dark:bg-blue-950 dark:text-gray-300">~200/mois</td>
+                      <td className="text-center py-4 px-6 dark:text-gray-300">~1000/mois</td>
                     </tr>
                     <tr>
-                      <td className="py-4 px-6 font-medium text-gray-900">Recherche multi-sources</td>
-                      <td className="text-center py-4 px-6"><Check className="h-5 w-5 text-green-600 mx-auto" /></td>
-                      <td className="text-center py-4 px-6 bg-blue-50"><Check className="h-5 w-5 text-green-600 mx-auto" /></td>
-                      <td className="text-center py-4 px-6"><Check className="h-5 w-5 text-green-600 mx-auto" /></td>
+                      <td className="py-4 px-6 font-medium text-gray-900 dark:text-white">Recherche multi-sources</td>
+                      <td className="text-center py-4 px-6"><Check className="h-5 w-5 text-green-600 dark:text-green-400 mx-auto" /></td>
+                      <td className="text-center py-4 px-6 bg-blue-50 dark:bg-blue-950"><Check className="h-5 w-5 text-green-600 dark:text-green-400 mx-auto" /></td>
+                      <td className="text-center py-4 px-6"><Check className="h-5 w-5 text-green-600 dark:text-green-400 mx-auto" /></td>
                     </tr>
                     <tr>
-                      <td className="py-4 px-6 font-medium text-gray-900">Enrichissement SIRENE</td>
-                      <td className="text-center py-4 px-6 text-gray-400">-</td>
-                      <td className="text-center py-4 px-6 bg-blue-50"><Check className="h-5 w-5 text-green-600 mx-auto" /></td>
-                      <td className="text-center py-4 px-6"><Check className="h-5 w-5 text-green-600 mx-auto" /></td>
+                      <td className="py-4 px-6 font-medium text-gray-900 dark:text-white">Enrichissement SIRENE</td>
+                      <td className="text-center py-4 px-6 text-gray-400 dark:text-gray-600">-</td>
+                      <td className="text-center py-4 px-6 bg-blue-50 dark:bg-blue-950"><Check className="h-5 w-5 text-green-600 dark:text-green-400 mx-auto" /></td>
+                      <td className="text-center py-4 px-6"><Check className="h-5 w-5 text-green-600 dark:text-green-400 mx-auto" /></td>
                     </tr>
                     <tr>
-                      <td className="py-4 px-6 font-medium text-gray-900">Analytics avancé</td>
-                      <td className="text-center py-4 px-6 text-gray-400">-</td>
-                      <td className="text-center py-4 px-6 bg-blue-50"><Check className="h-5 w-5 text-green-600 mx-auto" /></td>
-                      <td className="text-center py-4 px-6"><Check className="h-5 w-5 text-green-600 mx-auto" /></td>
+                      <td className="py-4 px-6 font-medium text-gray-900 dark:text-white">Analytics avancé</td>
+                      <td className="text-center py-4 px-6 text-gray-400 dark:text-gray-600">-</td>
+                      <td className="text-center py-4 px-6 bg-blue-50 dark:bg-blue-950"><Check className="h-5 w-5 text-green-600 dark:text-green-400 mx-auto" /></td>
+                      <td className="text-center py-4 px-6"><Check className="h-5 w-5 text-green-600 dark:text-green-400 mx-auto" /></td>
                     </tr>
                     <tr>
-                      <td className="py-4 px-6 font-medium text-gray-900">Accès API</td>
-                      <td className="text-center py-4 px-6 text-gray-400">-</td>
-                      <td className="text-center py-4 px-6 bg-blue-50 text-gray-400">-</td>
-                      <td className="text-center py-4 px-6"><Check className="h-5 w-5 text-green-600 mx-auto" /></td>
+                      <td className="py-4 px-6 font-medium text-gray-900 dark:text-white">Accès API</td>
+                      <td className="text-center py-4 px-6 text-gray-400 dark:text-gray-600">-</td>
+                      <td className="text-center py-4 px-6 bg-blue-50 dark:bg-blue-950 text-gray-400 dark:text-gray-600">-</td>
+                      <td className="text-center py-4 px-6"><Check className="h-5 w-5 text-green-600 dark:text-green-400 mx-auto" /></td>
                     </tr>
                     <tr>
-                      <td className="py-4 px-6 font-medium text-gray-900">Utilisateurs</td>
-                      <td className="text-center py-4 px-6">1</td>
-                      <td className="text-center py-4 px-6 bg-blue-50">3</td>
-                      <td className="text-center py-4 px-6">Illimité</td>
+                      <td className="py-4 px-6 font-medium text-gray-900 dark:text-white">Utilisateurs</td>
+                      <td className="text-center py-4 px-6 dark:text-gray-300">1</td>
+                      <td className="text-center py-4 px-6 bg-blue-50 dark:bg-blue-950 dark:text-gray-300">3</td>
+                      <td className="text-center py-4 px-6 dark:text-gray-300">Illimité</td>
                     </tr>
                     <tr>
-                      <td className="py-4 px-6 font-medium text-gray-900">Support</td>
-                      <td className="text-center py-4 px-6 text-sm">Email</td>
-                      <td className="text-center py-4 px-6 bg-blue-50 text-sm">Prioritaire</td>
-                      <td className="text-center py-4 px-6 text-sm">Dédié 7j/7</td>
+                      <td className="py-4 px-6 font-medium text-gray-900 dark:text-white">Support</td>
+                      <td className="text-center py-4 px-6 text-sm dark:text-gray-300">Email</td>
+                      <td className="text-center py-4 px-6 bg-blue-50 dark:bg-blue-950 text-sm dark:text-gray-300">Prioritaire</td>
+                      <td className="text-center py-4 px-6 text-sm dark:text-gray-300">Dédié 7j/7</td>
                     </tr>
                   </tbody>
                 </table>
@@ -312,20 +312,20 @@ export default function PricingPage() {
               <Badge className="mb-4" variant="outline">
                 FAQ
               </Badge>
-              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 mb-4">
+              <h2 className="text-3xl md:text-4xl font-bold text-gray-900 dark:text-white mb-4">
                 Questions fréquentes sur la tarification
               </h2>
-              <p className="text-lg text-gray-600">
+              <p className="text-lg text-gray-600 dark:text-gray-300">
                 Tout ce que vous devez savoir avant de vous lancer
               </p>
             </div>
 
             <Accordion type="single" collapsible className="space-y-4">
-              <AccordionItem value="item-1" className="border-2 rounded-lg px-6 bg-white">
-                <AccordionTrigger className="text-left font-semibold hover:no-underline">
+              <AccordionItem value="item-1" className="border-2 dark:border-gray-700 rounded-lg px-6 bg-white dark:bg-gray-800">
+                <AccordionTrigger className="text-left font-semibold dark:text-white hover:no-underline">
                   Comment fonctionnent les crédits exactement ?
                 </AccordionTrigger>
-                <AccordionContent className="text-gray-600 text-base leading-relaxed">
+                <AccordionContent className="text-gray-600 dark:text-gray-300 text-base leading-relaxed">
                   Vous achetez des crédits selon votre formule d'abonnement. <strong>10 crédits = 1 résultat validé</strong>.
                   Vous visualisez d'abord gratuitement une estimation du nombre de résultats, puis vous validez
                   la recherche qui débitera vos crédits. Vous ne payez que pour les résultats que vous consultez effectivement.
@@ -333,66 +333,66 @@ export default function PricingPage() {
                 </AccordionContent>
               </AccordionItem>
 
-              <AccordionItem value="item-2" className="border-2 rounded-lg px-6 bg-white">
-                <AccordionTrigger className="text-left font-semibold hover:no-underline">
+              <AccordionItem value="item-2" className="border-2 dark:border-gray-700 rounded-lg px-6 bg-white dark:bg-gray-800">
+                <AccordionTrigger className="text-left font-semibold dark:text-white hover:no-underline">
                   Puis-je changer de plan en cours de route ?
                 </AccordionTrigger>
-                <AccordionContent className="text-gray-600 text-base leading-relaxed">
+                <AccordionContent className="text-gray-600 dark:text-gray-300 text-base leading-relaxed">
                   Oui, absolument ! Vous pouvez passer à un plan supérieur ou inférieur à tout moment depuis
                   votre dashboard. En cas d'upgrade, vous êtes facturé au prorata. En cas de downgrade,
                   le changement prend effet à la prochaine période de facturation.
                 </AccordionContent>
               </AccordionItem>
 
-              <AccordionItem value="item-3" className="border-2 rounded-lg px-6 bg-white">
-                <AccordionTrigger className="text-left font-semibold hover:no-underline">
+              <AccordionItem value="item-3" className="border-2 dark:border-gray-700 rounded-lg px-6 bg-white dark:bg-gray-800">
+                <AccordionTrigger className="text-left font-semibold dark:text-white hover:no-underline">
                   Que se passe-t-il si je dépasse mes crédits ?
                 </AccordionTrigger>
-                <AccordionContent className="text-gray-600 text-base leading-relaxed">
+                <AccordionContent className="text-gray-600 dark:text-gray-300 text-base leading-relaxed">
                   Les résultats supplémentaires sont facturés au tarif indiqué dans votre plan
                   (entre 0,04€ et 0,06€ par résultat selon votre formule). Vous recevez une notification
                   lorsque vous atteignez 80% de vos crédits. Vous pouvez aussi upgrader votre plan à tout moment.
                 </AccordionContent>
               </AccordionItem>
 
-              <AccordionItem value="item-4" className="border-2 rounded-lg px-6 bg-white">
-                <AccordionTrigger className="text-left font-semibold hover:no-underline">
+              <AccordionItem value="item-4" className="border-2 dark:border-gray-700 rounded-lg px-6 bg-white dark:bg-gray-800">
+                <AccordionTrigger className="text-left font-semibold dark:text-white hover:no-underline">
                   L'essai gratuit est-il vraiment gratuit ?
                 </AccordionTrigger>
-                <AccordionContent className="text-gray-600 text-base leading-relaxed">
+                <AccordionContent className="text-gray-600 dark:text-gray-300 text-base leading-relaxed">
                   Oui ! L'essai gratuit de 7 jours vous donne accès à toutes les fonctionnalités du plan Pro
                   avec 100 crédits offerts. Aucune carte bancaire n'est requise à l'inscription.
                   Au bout de 7 jours, vous décidez si vous souhaitez continuer avec un abonnement payant.
                 </AccordionContent>
               </AccordionItem>
 
-              <AccordionItem value="item-5" className="border-2 rounded-lg px-6 bg-white">
-                <AccordionTrigger className="text-left font-semibold hover:no-underline">
+              <AccordionItem value="item-5" className="border-2 dark:border-gray-700 rounded-lg px-6 bg-white dark:bg-gray-800">
+                <AccordionTrigger className="text-left font-semibold dark:text-white hover:no-underline">
                   Comment annuler mon abonnement ?
                 </AccordionTrigger>
-                <AccordionContent className="text-gray-600 text-base leading-relaxed">
+                <AccordionContent className="text-gray-600 dark:text-gray-300 text-base leading-relaxed">
                   Vous pouvez annuler votre abonnement en 1 clic depuis votre dashboard dans les paramètres.
                   Aucun engagement, aucune question posée. Vous gardez l'accès à la plateforme jusqu'à
                   la fin de votre période déjà payée. Vos données et historique sont conservés pendant 30 jours.
                 </AccordionContent>
               </AccordionItem>
 
-              <AccordionItem value="item-6" className="border-2 rounded-lg px-6 bg-white">
-                <AccordionTrigger className="text-left font-semibold hover:no-underline">
+              <AccordionItem value="item-6" className="border-2 dark:border-gray-700 rounded-lg px-6 bg-white dark:bg-gray-800">
+                <AccordionTrigger className="text-left font-semibold dark:text-white hover:no-underline">
                   Proposez-vous des réductions pour les volumes importants ?
                 </AccordionTrigger>
-                <AccordionContent className="text-gray-600 text-base leading-relaxed">
+                <AccordionContent className="text-gray-600 dark:text-gray-300 text-base leading-relaxed">
                   Oui ! Si vous avez besoin de plus de 10 000 crédits par mois, contactez notre équipe commerciale
                   pour obtenir un devis personnalisé. Nous proposons des tarifs dégressifs pour les gros volumes
                   ainsi que des options d'intégration API avancées.
                 </AccordionContent>
               </AccordionItem>
 
-              <AccordionItem value="item-7" className="border-2 rounded-lg px-6 bg-white">
-                <AccordionTrigger className="text-left font-semibold hover:no-underline">
+              <AccordionItem value="item-7" className="border-2 dark:border-gray-700 rounded-lg px-6 bg-white dark:bg-gray-800">
+                <AccordionTrigger className="text-left font-semibold dark:text-white hover:no-underline">
                   Les données sont-elles légales et conformes RGPD ?
                 </AccordionTrigger>
-                <AccordionContent className="text-gray-600 text-base leading-relaxed">
+                <AccordionContent className="text-gray-600 dark:text-gray-300 text-base leading-relaxed">
                   Absolument. Nous utilisons exclusivement des données publiques issues de sources officielles
                   (DGFiP, INSEE, cadastre, DVF, SIRENE). Toutes nos pratiques sont 100% conformes au RGPD et
                   à la réglementation française sur la protection des données personnelles.
