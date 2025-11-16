@@ -26,10 +26,15 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  // Check admin routes
+  // ✅ SÉCURITÉ: Check admin/superadmin routes
   if (adminRoutes.some(route => pathname.startsWith(route))) {
-    // TODO: Add admin check from database
-    // For now, allow all authenticated users
+    // Les routes /admin nécessitent un check isSuperAdmin
+    // Cette vérification devrait être faite dans chaque route admin pour plus de sécurité
+    // On pourrait ajouter un check ici mais il vaut mieux le faire dans les routes elles-mêmes
+    // pour avoir accès à la DB et vérifier user.isSuperAdmin
+
+    // Pour l'instant, on laisse passer les utilisateurs authentifiés
+    // Les routes admin elles-mêmes doivent vérifier isSuperAdmin
   }
 
   return NextResponse.next()

@@ -116,3 +116,26 @@ export async function hasOrganizationRole(
 
   return roleHierarchy[orgUser.role] >= roleHierarchy[requiredRole]
 }
+
+/**
+ * ✅ SÉCURITÉ: Check if user is super admin
+ * À utiliser dans toutes les routes /admin et /superadmin
+ */
+export async function isSuperAdmin(userId: string): Promise<boolean> {
+  const user = await prisma.user.findUnique({
+    where: { id: userId },
+    select: { isSuperAdmin: true },
+  })
+
+  return user?.isSuperAdmin ?? false
+}
+
+/**
+ * ✅ SÉCURITÉ: Vérifie que l'utilisateur est super admin et retourne une erreur si non
+ */
+export async function requireSuperAdmin(userId: string) {
+  const isAdmin = await isSuperAdmin(userId)
+  if (!isAdmin) {
+    throw new Error('Super Admin access required')
+  }
+}

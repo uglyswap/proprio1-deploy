@@ -1,10 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import bcrypt from 'bcrypt'
+import { validateRequest, registerSchema } from '@/lib/validations'
 
 export async function POST(req: NextRequest) {
   try {
-    const { name, email, password, organizationName } = await req.json()
+    // ✅ SÉCURITÉ: Validation Zod des inputs
+    const validation = await validateRequest(req, registerSchema)
+    if (!validation.success) {
+      return NextResponse.json({ error: validation.error }, { status: 400 })
+    }
+
+    const { name, email, password, organizationName } = validation.data
 
     // Check if user already exists
     const existingUser = await prisma.user.findUnique({

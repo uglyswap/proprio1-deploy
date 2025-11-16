@@ -1,8 +1,9 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
+import { authOptions, getUserOrganization } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { deductCredits } from '@/lib/credits'
+import { validateRequest, searchValidateSchema } from '@/lib/validations'
 
 export async function POST(req: NextRequest) {
   try {
@@ -12,7 +13,13 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
     }
 
-    const { searchId } = await req.json()
+    // ✅ SÉCURITÉ: Validation Zod des inputs
+    const validation = await validateRequest(req, searchValidateSchema)
+    if (!validation.success) {
+      return NextResponse.json({ error: validation.error }, { status: 400 })
+    }
+
+    const { searchId } = validation.data
 
     const search = await prisma.search.findUnique({
       where: { id: searchId },
@@ -23,9 +30,15 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: 'Search not found' }, { status: 404 })
     }
 
-    // Verify user belongs to organization
+    // ✅ SÉCURITÉ: Vérifier que l'utilisateur appartient à l'organisation
+    const userOrg = await getUserOrganization(session.user.id)
+    if (!userOrg || search.organizationId !== userOrg.id) {
+      return NextResponse.json({ error: 'Unauthorized - Organization mismatch' }, { status: 403 })
+    }
+
+    // Verify user is the one who created the search
     if (search.userId !== session.user.id) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 403 })
+      return NextResponse.json({ error: 'Unauthorized - Not your search' }, { status: 403 })
     }
 
     // Check if already validated

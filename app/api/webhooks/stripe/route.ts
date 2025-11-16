@@ -7,9 +7,9 @@ import { addCredits } from '@/lib/credits'
 import { SubscriptionPlan, SubscriptionStatus } from '@prisma/client'
 
 const PLAN_CREDITS = {
-  BASIC: 500,
-  PRO: 3000,
-  ENTERPRISE: 20000,
+  BASIC: 500,      // 500 crédits = ~50 résultats (pricing page ✓)
+  PRO: 2000,       // 2000 crédits = ~200 résultats (pricing page ✓)
+  ENTERPRISE: 10000, // 10000 crédits = ~1000 résultats (pricing page ✓)
 }
 
 export async function POST(req: NextRequest) {
@@ -182,5 +182,8 @@ function getPlanFromPriceId(priceId: string): SubscriptionPlan {
   if (priceId === process.env.STRIPE_BASIC_PRICE_ID) return 'BASIC'
   if (priceId === process.env.STRIPE_PRO_PRICE_ID) return 'PRO'
   if (priceId === process.env.STRIPE_ENTERPRISE_PRICE_ID) return 'ENTERPRISE'
-  return 'FREE'
+
+  // ❌ SÉCURITÉ: Ne jamais retourner FREE pour un prix inconnu
+  // Un client qui paie doit toujours recevoir son plan
+  throw new Error(`Unknown Stripe price ID: ${priceId}. Cannot determine subscription plan.`)
 }

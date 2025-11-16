@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { getUserOrganization } from '@/lib/auth'
 import { getOrCreateStripeCustomer, createCheckoutSession } from '@/lib/stripe'
+import { validateRequest, stripeCheckoutSchema } from '@/lib/validations'
 
 export async function POST(req: NextRequest) {
   try {
@@ -21,7 +22,13 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    const { priceId } = await req.json()
+    // ✅ SÉCURITÉ: Validation Zod du priceId
+    const validation = await validateRequest(req, stripeCheckoutSchema)
+    if (!validation.success) {
+      return NextResponse.json({ error: validation.error }, { status: 400 })
+    }
+
+    const { priceId } = validation.data
 
     // Get or create Stripe customer
     const customerId = await getOrCreateStripeCustomer(
