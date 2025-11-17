@@ -21,6 +21,7 @@ const navigation = [
   { name: 'Dashboard', href: '/superadmin', icon: LayoutDashboard },
   { name: 'Clients', href: '/superadmin/clients', icon: Users },
   { name: 'Analytics', href: '/superadmin/analytics', icon: Activity },
+  { name: 'Feature Flags', href: '/superadmin/features', icon: Shield },
   { name: 'Sources de Données', href: '/superadmin/datasources', icon: Database },
   { name: 'Configuration Stripe', href: '/superadmin/stripe', icon: CreditCard },
   { name: 'APIs', href: '/superadmin/apis', icon: Plug },
