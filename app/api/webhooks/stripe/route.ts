@@ -5,6 +5,9 @@ import { stripe } from '@/lib/stripe'
 import { prisma } from '@/lib/prisma'
 import { addCredits } from '@/lib/credits'
 import { SubscriptionPlan, SubscriptionStatus } from '@prisma/client'
+import { webhookLogger, logError, logSuccess } from '@/lib/logger'
+
+const log = webhookLogger('stripe')
 
 const PLAN_CREDITS = {
   BASIC: 500,      // 500 crédits = ~50 résultats (pricing page ✓)
@@ -24,8 +27,12 @@ export async function POST(req: NextRequest) {
       signature,
       process.env.STRIPE_WEBHOOK_SECRET!
     )
+    log.debug({ eventType: event.type }, 'Webhook signature verified')
   } catch (error) {
-    console.error('Webhook signature verification failed:', error)
+    logError(error, {
+      component: 'webhook',
+      action: 'signature_verification',
+    })
     return new NextResponse('Webhook Error', { status: 400 })
   }
 
@@ -87,9 +94,14 @@ export async function POST(req: NextRequest) {
       }
     }
 
+    log.info({ eventType: event.type }, 'Webhook processed successfully')
     return new NextResponse(null, { status: 200 })
   } catch (error) {
-    console.error('Webhook handler error:', error)
+    logError(error, {
+      component: 'webhook',
+      action: 'process_event',
+      metadata: { eventType: event.type },
+    })
     return new NextResponse('Webhook Error', { status: 500 })
   }
 }

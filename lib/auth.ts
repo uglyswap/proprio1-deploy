@@ -3,6 +3,8 @@ import { PrismaAdapter } from '@next-auth/prisma-adapter'
 import CredentialsProvider from 'next-auth/providers/credentials'
 import bcrypt from 'bcrypt'
 import { prisma } from './prisma'
+import { withCache, CacheKeys, CACHE_TTL } from './cache'
+import { logger } from './logger'
 
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
@@ -77,20 +79,35 @@ export const authOptions: NextAuthOptions = {
 }
 
 /**
- * Get the current user's organization
+ * ✅ PERFORMANCE: Get the current user's organization (avec cache Redis)
+ * Cette fonction est très sollicitée, le cache améliore drastiquement les perfs
  */
 export async function getUserOrganization(userId: string) {
-  const orgUser = await prisma.organizationUser.findFirst({
-    where: { userId },
-    include: {
-      organization: true,
-    },
-    orderBy: {
-      createdAt: 'desc',
-    },
-  })
+  return withCache(
+    CacheKeys.userOrganization(userId),
+    CACHE_TTL.USER_ORG,
+    async () => {
+      const startTime = Date.now()
 
-  return orgUser?.organization
+      const orgUser = await prisma.organizationUser.findFirst({
+        where: { userId },
+        include: {
+          organization: true,
+        },
+        orderBy: {
+          createdAt: 'desc',
+        },
+      })
+
+      const duration = Date.now() - startTime
+      logger.debug(
+        { userId, duration, cached: false, component: 'auth' },
+        'getUserOrganization executed'
+      )
+
+      return orgUser?.organization
+    }
+  )
 }
 
 /**

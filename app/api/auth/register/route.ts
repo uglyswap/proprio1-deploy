@@ -2,12 +2,18 @@ import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
 import bcrypt from 'bcrypt'
 import { validateRequest, registerSchema } from '@/lib/validations'
+import { apiLogger, logError, logSuccess } from '@/lib/logger'
+
+const log = apiLogger('/api/auth/register')
 
 export async function POST(req: NextRequest) {
+  const startTime = Date.now()
+
   try {
     // ✅ SÉCURITÉ: Validation Zod des inputs
     const validation = await validateRequest(req, registerSchema)
     if (!validation.success) {
+      log.warn({ error: validation.error }, 'Registration validation failed')
       return NextResponse.json({ error: validation.error }, { status: 400 })
     }
 
@@ -19,6 +25,7 @@ export async function POST(req: NextRequest) {
     })
 
     if (existingUser) {
+      log.warn({ email }, 'Registration attempt with existing email')
       return NextResponse.json(
         { error: 'Un compte existe déjà avec cet email' },
         { status: 400 }
@@ -77,13 +84,28 @@ export async function POST(req: NextRequest) {
       return { user, organization }
     })
 
+    const duration = Date.now() - startTime
+    logSuccess('User registered successfully', {
+      component: 'auth',
+      action: 'register',
+      userId: result.user.id,
+      organizationId: result.organization.id,
+      metadata: { email, duration },
+    })
+
     return NextResponse.json({
       success: true,
       message: 'Compte créé avec succès',
       userId: result.user.id,
     })
   } catch (error) {
-    console.error('Registration error:', error)
+    const duration = Date.now() - startTime
+    logError(error, {
+      component: 'auth',
+      action: 'register',
+      metadata: { email, duration },
+    })
+
     return NextResponse.json(
       { error: 'Erreur lors de la création du compte' },
       { status: 500 }
