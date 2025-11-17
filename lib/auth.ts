@@ -68,9 +68,26 @@ export const authOptions: NextAuthOptions = {
 
       return session
     },
-    async jwt({ token, user }) {
+    async jwt({ token, user, trigger }) {
+      // Initial sign in - fetch isSuperAdmin from DB
       if (user) {
         token.id = user.id
+
+        // Fetch isSuperAdmin flag for middleware checks
+        const dbUser = await prisma.user.findUnique({
+          where: { id: user.id },
+          select: { isSuperAdmin: true },
+        })
+        token.isSuperAdmin = dbUser?.isSuperAdmin ?? false
+      }
+
+      // On update, refresh isSuperAdmin from DB
+      if (trigger === 'update') {
+        const dbUser = await prisma.user.findUnique({
+          where: { id: token.id as string },
+          select: { isSuperAdmin: true },
+        })
+        token.isSuperAdmin = dbUser?.isSuperAdmin ?? false
       }
 
       return token

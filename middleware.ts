@@ -3,7 +3,7 @@ import type { NextRequest } from 'next/server'
 import { getToken } from 'next-auth/jwt'
 
 const publicRoutes = ['/', '/auth/signin', '/auth/signup', '/auth/forgot-password', '/pricing']
-const adminRoutes = ['/admin']
+const superAdminRoutes = ['/superadmin']
 
 export async function middleware(request: NextRequest) {
   const { pathname } = request.nextUrl
@@ -26,15 +26,14 @@ export async function middleware(request: NextRequest) {
     return NextResponse.redirect(url)
   }
 
-  // ✅ SÉCURITÉ: Check admin/superadmin routes
-  if (adminRoutes.some(route => pathname.startsWith(route))) {
-    // Les routes /admin nécessitent un check isSuperAdmin
-    // Cette vérification devrait être faite dans chaque route admin pour plus de sécurité
-    // On pourrait ajouter un check ici mais il vaut mieux le faire dans les routes elles-mêmes
-    // pour avoir accès à la DB et vérifier user.isSuperAdmin
-
-    // Pour l'instant, on laisse passer les utilisateurs authentifiés
-    // Les routes admin elles-mêmes doivent vérifier isSuperAdmin
+  // 🔒 SÉCURITÉ CRITIQUE: Check SuperAdmin routes
+  if (superAdminRoutes.some(route => pathname.startsWith(route))) {
+    // Vérifier que l'utilisateur est SuperAdmin via le token JWT
+    // Le token contient isSuperAdmin car on l'ajoute dans callbacks.jwt
+    if (!token.isSuperAdmin) {
+      // Rediriger vers dashboard normal si pas SuperAdmin
+      return NextResponse.redirect(new URL('/dashboard', request.url))
+    }
   }
 
   return NextResponse.next()

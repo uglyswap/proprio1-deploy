@@ -96,10 +96,10 @@ async function AnalyticsContent() {
     <div className="p-8 space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-3xl font-bold text-gray-900">
+        <h1 className="text-3xl font-bold text-gray-900 dark:text-white">
           Analytics & Business Intelligence
         </h1>
-        <p className="text-gray-600 mt-1">
+        <p className="text-gray-600 dark:text-gray-300 mt-1">
           Vue complète de vos métriques SaaS sur 30 jours
         </p>
       </div>
