@@ -1,7 +1,7 @@
 import { NextAuthOptions } from 'next-auth'
 import { PrismaAdapter } from '@next-auth/prisma-adapter'
 import CredentialsProvider from 'next-auth/providers/credentials'
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcryptjs'
 import { prisma } from './prisma'
 import { withCache, CacheKeys, CACHE_TTL } from './cache'
 import { logger } from './logger'
@@ -96,8 +96,8 @@ export const authOptions: NextAuthOptions = {
 }
 
 /**
- * ✅ PERFORMANCE: Get the current user's organization (avec cache Redis)
- * Cette fonction est très sollicitée, le cache améliore drastiquement les perfs
+ * PERFORMANCE: Get the current user's organization (avec cache Redis)
+ * Cette fonction est tres sollicitee, le cache ameliore drastiquement les perfs
  */
 export async function getUserOrganization(userId: string) {
   return withCache(
@@ -152,8 +152,8 @@ export async function hasOrganizationRole(
 }
 
 /**
- * ✅ SÉCURITÉ: Check if user is super admin
- * À utiliser dans toutes les routes /admin et /superadmin
+ * SECURITE: Check if user is super admin
+ * A utiliser dans toutes les routes /admin et /superadmin
  */
 export async function isSuperAdmin(userId: string): Promise<boolean> {
   const user = await prisma.user.findUnique({
@@ -165,7 +165,7 @@ export async function isSuperAdmin(userId: string): Promise<boolean> {
 }
 
 /**
- * ✅ SÉCURITÉ: Vérifie que l'utilisateur est super admin et retourne une erreur si non
+ * SECURITE: Verifie que l'utilisateur est super admin et retourne une erreur si non
  */
 export async function requireSuperAdmin(userId: string) {
   const isAdmin = await isSuperAdmin(userId)
