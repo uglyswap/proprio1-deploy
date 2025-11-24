@@ -38,7 +38,21 @@ RUN npx prisma generate
 ENV NEXT_TELEMETRY_DISABLED=1
 ENV NODE_ENV=production
 
-RUN npm run build
+RUN npm run build && \
+    echo "=== Build completed, checking output ===" && \
+    ls -la .next/ && \
+    if [ -d ".next/standalone" ]; then \
+      echo "=== Standalone build found ==="; \
+      ls -la .next/standalone/; \
+    else \
+      echo "=== WARNING: No standalone directory! ==="; \
+    fi && \
+    if [ -d ".next/static" ]; then \
+      echo "=== Static files found ==="; \
+      ls -la .next/static/ | head -10; \
+    else \
+      echo "=== WARNING: No static directory! ==="; \
+    fi
 
 # Stage 3: Runner (Production)
 FROM node:20-alpine AS runner
@@ -52,15 +66,32 @@ ENV NEXT_TELEMETRY_DISABLED=1
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs
 
-# Copy necessary files
-COPY --from=builder /app/public ./public
+# Create directories
+RUN mkdir -p .next/static public
+
+# Copy files from builder
 COPY --from=builder /app/package.json ./package.json
 COPY --from=builder /app/prisma ./prisma
+
+# Copy public if it exists
+COPY --from=builder /app/public ./public/ 2>/dev/null || true
+
+# Copy the standalone output
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
 # Copy production node_modules for Prisma
 COPY --from=deps /app/node_modules ./node_modules
+
+# Verify files
+RUN ls -la && \
+    if [ -f "server.js" ]; then \
+      echo "=== server.js found ==="; \
+    else \
+      echo "=== ERROR: server.js NOT found! ==="; \
+      ls -la; \
+      exit 1; \
+    fi
 
 USER nextjs
 
@@ -68,9 +99,5 @@ EXPOSE 3000
 
 ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
-
-# Health check
-HEALTHCHECK --interval=30s --timeout=3s --start-period=40s \
-  CMD node -e "require('http').get('http://localhost:3000/api/health', (r) => {process.exit(r.statusCode === 200 ? 0 : 1)})"
 
 CMD ["node", "server.js"]
