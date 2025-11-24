@@ -2,9 +2,7 @@
 
 import { useEffect, useRef, useState } from 'react'
 import L from 'leaflet'
-import 'leaflet/dist/leaflet.css'
 import 'leaflet-draw'
-import 'leaflet-draw/dist/leaflet.draw.css'
 
 // Fix Leaflet default icon issue with Next.js
 delete (L.Icon.Default.prototype as any)._getIconUrl
