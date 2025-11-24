@@ -5,6 +5,9 @@ const nextConfig = {
   // Enable standalone output for Docker
   output: 'standalone',
 
+  // Transpile leaflet packages for CSS imports to work
+  transpilePackages: ['leaflet', 'leaflet-draw', 'react-leaflet', 'react-leaflet-draw'],
+
   images: {
     domains: ['lh3.googleusercontent.com', 'avatars.githubusercontent.com'],
     // Optimize images for production
