@@ -1,5 +1,9 @@
 'use client'
 
+// Leaflet CSS must be imported in a client component
+import 'leaflet/dist/leaflet.css'
+import 'leaflet-draw/dist/leaflet.draw.css'
+
 import { SessionProvider } from 'next-auth/react'
 import { ThemeProvider } from 'next-themes'
 
