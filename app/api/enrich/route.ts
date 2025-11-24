@@ -45,18 +45,18 @@ export async function POST(req: NextRequest) {
       )
     }
 
-    // Check search is completed
-    if (search.status !== 'COMPLETED') {
+    // Check search status - only allow if COMPLETED
+    const status = search.status as string
+    if (status === 'ENRICHING' || status === 'ENRICHED') {
       return NextResponse.json(
-        { error: 'Search must be completed before enrichment' },
+        { error: 'Search already enriched or enriching' },
         { status: 400 }
       )
     }
 
-    // Check if already enriching or enriched
-    if (search.status === 'ENRICHING' || search.status === 'ENRICHED') {
+    if (status !== 'COMPLETED') {
       return NextResponse.json(
-        { error: 'Search already enriched or enriching' },
+        { error: 'Search must be completed before enrichment' },
         { status: 400 }
       )
     }
