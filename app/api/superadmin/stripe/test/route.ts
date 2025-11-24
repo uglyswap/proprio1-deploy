@@ -16,7 +16,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Tester la connexion
-    const stripe = new Stripe(secretKey, { apiVersion: '2024-11-20.acacia' })
+    const stripe = new Stripe(secretKey, { apiVersion: '2023-10-16' })
 
     const account = await stripe.accounts.retrieve()
 

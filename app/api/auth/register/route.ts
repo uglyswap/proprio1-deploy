@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { prisma } from '@/lib/prisma'
-import bcrypt from 'bcrypt'
+import bcrypt from 'bcryptjs'
 import { validateRequest, registerSchema } from '@/lib/validations'
 import { apiLogger, logError, logSuccess } from '@/lib/logger'
 
@@ -10,7 +10,7 @@ export async function POST(req: NextRequest) {
   const startTime = Date.now()
 
   try {
-    // ✅ SÉCURITÉ: Validation Zod des inputs
+    // SECURITE: Validation Zod des inputs
     const validation = await validateRequest(req, registerSchema)
     if (!validation.success) {
       log.warn({ error: validation.error }, 'Registration validation failed')
@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
     if (existingUser) {
       log.warn({ email }, 'Registration attempt with existing email')
       return NextResponse.json(
-        { error: 'Un compte existe déjà avec cet email' },
+        { error: 'Un compte existe deja avec cet email' },
         { status: 400 }
       )
     }
@@ -58,7 +58,7 @@ export async function POST(req: NextRequest) {
           name: organizationName,
           slug,
           plan: 'FREE',
-          creditBalance: 100, // 100 crédits gratuits
+          creditBalance: 100, // 100 credits gratuits
         },
       })
 
@@ -77,7 +77,7 @@ export async function POST(req: NextRequest) {
           organizationId: organization.id,
           amount: 100,
           type: 'ADJUSTMENT',
-          description: 'Crédits de bienvenue',
+          description: 'Credits de bienvenue',
         },
       })
 
@@ -95,7 +95,7 @@ export async function POST(req: NextRequest) {
 
     return NextResponse.json({
       success: true,
-      message: 'Compte créé avec succès',
+      message: 'Compte cree avec succes',
       userId: result.user.id,
     })
   } catch (error) {
@@ -103,11 +103,11 @@ export async function POST(req: NextRequest) {
     logError(error, {
       component: 'auth',
       action: 'register',
-      metadata: { email, duration },
+      metadata: { duration },
     })
 
     return NextResponse.json(
-      { error: 'Erreur lors de la création du compte' },
+      { error: 'Erreur lors de la creation du compte' },
       { status: 500 }
     )
   }

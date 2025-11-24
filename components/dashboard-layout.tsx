@@ -17,7 +17,8 @@ import {
   Coins,
 } from 'lucide-react'
 
-export default function DashboardLayout({
+// Named export for compatibility
+export function DashboardLayout({
   children,
 }: {
   children: React.ReactNode
@@ -131,3 +132,6 @@ export default function DashboardLayout({
     </div>
   )
 }
+
+// Default export for backward compatibility
+export default DashboardLayout

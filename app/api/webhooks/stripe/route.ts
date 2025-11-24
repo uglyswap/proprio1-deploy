@@ -9,7 +9,8 @@ import { webhookLogger, logError, logSuccess } from '@/lib/logger'
 
 const log = webhookLogger('stripe')
 
-const PLAN_CREDITS = {
+const PLAN_CREDITS: Record<SubscriptionPlan, number> = {
+  FREE: 0,         // Free plan has no credits
   BASIC: 500,      // 500 crédits = ~50 résultats (pricing page ✓)
   PRO: 2000,       // 2000 crédits = ~200 résultats (pricing page ✓)
   ENTERPRISE: 10000, // 10000 crédits = ~1000 résultats (pricing page ✓)
@@ -130,12 +131,14 @@ async function handleSubscriptionCreated(
 
   // Add credits
   const credits = PLAN_CREDITS[plan]
-  await addCredits(
-    organizationId,
-    credits,
-    'SUBSCRIPTION',
-    `${plan} plan - monthly credits`
-  )
+  if (credits > 0) {
+    await addCredits(
+      organizationId,
+      credits,
+      'SUBSCRIPTION',
+      `${plan} plan - monthly credits`
+    )
+  }
 }
 
 async function handlePaymentSucceeded(
@@ -146,12 +149,14 @@ async function handlePaymentSucceeded(
 
   // Renew monthly credits
   const credits = PLAN_CREDITS[plan]
-  await addCredits(
-    organizationId,
-    credits,
-    'SUBSCRIPTION',
-    `${plan} plan - monthly renewal`
-  )
+  if (credits > 0) {
+    await addCredits(
+      organizationId,
+      credits,
+      'SUBSCRIPTION',
+      `${plan} plan - monthly renewal`
+    )
+  }
 }
 
 async function handleSubscriptionUpdated(

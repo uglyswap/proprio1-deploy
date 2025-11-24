@@ -315,7 +315,7 @@ export default function MapSearchAdvanced({
         polygon: {
           allowIntersection: false,
           showArea: true,
-          metric: ['ha', 'km'],
+          metric: true as any, // Use metric units (types are incorrect in @types/leaflet-draw)
           shapeOptions: {
             color: '#3b82f6',
             weight: 3,
@@ -324,7 +324,7 @@ export default function MapSearchAdvanced({
         },
         rectangle: {
           showArea: true,
-          metric: ['ha', 'km'],
+          metric: true as any,
           shapeOptions: {
             color: '#3b82f6',
             weight: 3,
@@ -337,7 +337,7 @@ export default function MapSearchAdvanced({
             weight: 3,
             fillOpacity: 0.2,
           },
-          metric: ['km'],
+          metric: true as any,
         },
         circlemarker: false,
         marker: true,
@@ -346,7 +346,7 @@ export default function MapSearchAdvanced({
             color: '#ef4444',
             weight: 3,
           },
-          metric: ['km', 'm'],
+          metric: true as any,
         },
       },
       edit: {

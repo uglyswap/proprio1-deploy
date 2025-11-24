@@ -1,0 +1,5 @@
+# Nixpacks configuration for Dokploy deployment
+# Use npm install instead of npm ci to avoid package-lock.json sync issues
+
+[phases.install]
+cmds = ["npm install"]
