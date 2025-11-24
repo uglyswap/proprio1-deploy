@@ -75,6 +75,20 @@ export default function RootLayout({
   return (
     <html lang="fr">
       <head>
+        {/* Leaflet CSS via CDN - most reliable method */}
+        <link
+          rel="stylesheet"
+          href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"
+          integrity="sha256-p4NxAoJBhIIN+hmNHrzRCf9tD/miZyoHS5obTRR9BMY="
+          crossOrigin=""
+        />
+        <link
+          rel="stylesheet"
+          href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/1.0.4/leaflet.draw.css"
+          integrity="sha512-gc3xjCmIy673V6MyOAZhIW93xhM9ei1I+gLbmFjUHIjocENRsLX/QUE1htk5f1XV2r/PmZoYhJKKSM4kK9FoLg=="
+          crossOrigin=""
+        />
+
         {/* Structured Data - Organization */}
         <Script
           id="structured-data-organization"
