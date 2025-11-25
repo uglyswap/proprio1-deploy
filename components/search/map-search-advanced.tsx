@@ -352,7 +352,7 @@ export default function MapSearchAdvanced({
       edit: {
         featureGroup: drawnItems,
         remove: true,
-        edit: true,
+        edit: {},
       },
     })
     map.addControl(drawControl)
