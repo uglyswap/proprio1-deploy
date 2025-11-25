@@ -13,27 +13,10 @@ cmds = [
   "npm run build"
 ]
 
-[phases.start]
+[start]
 cmd = "npm start"
 
 [variables]
 NODE_ENV = "production"
 NEXT_TELEMETRY_DISABLED = "1"
-# Build-time placeholders (real values injected at runtime)
-DATABASE_URL = "postgresql://placeholder:placeholder@localhost:5432/placeholder"
-NEXTAUTH_URL = "http://localhost:3000"
-NEXTAUTH_SECRET = "build-time-secret-placeholder-32chars"
-STRIPE_SECRET_KEY = "sk_test_placeholder"
-STRIPE_PUBLISHABLE_KEY = "pk_test_placeholder"
-STRIPE_WEBHOOK_SECRET = "whsec_placeholder"
-STRIPE_BASIC_PRICE_ID = "price_basic"
-STRIPE_PRO_PRICE_ID = "price_pro"
-STRIPE_ENTERPRISE_PRICE_ID = "price_enterprise"
-NEXT_PUBLIC_STRIPE_BASIC_PRICE_ID = "price_basic"
-NEXT_PUBLIC_STRIPE_PRO_PRICE_ID = "price_pro"
-NEXT_PUBLIC_STRIPE_ENTERPRISE_PRICE_ID = "price_enterprise"
-NEXT_PUBLIC_APP_URL = "http://localhost:3000"
-NEXT_PUBLIC_APP_NAME = "ProprioFinder"
-REDIS_URL = "redis://localhost:6379"
-ENCRYPTION_SECRET = "build-time-encryption-secret-32ch"
-CRON_SECRET = "build-time-cron-secret"
+PORT = "3000"
