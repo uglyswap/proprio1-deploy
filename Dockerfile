@@ -27,11 +27,40 @@ COPY . .
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
 
+# ================================
+# BUILD-TIME ENVIRONMENT VARIABLES
+# These are placeholders for Next.js build
+# Real values are injected at runtime
+# ================================
+ENV DATABASE_URL="postgresql://placeholder:placeholder@localhost:5432/placeholder"
+ENV NEXTAUTH_URL="http://localhost:3000"
+ENV NEXTAUTH_SECRET="build-time-secret-placeholder"
+ENV STRIPE_SECRET_KEY="sk_test_placeholder"
+ENV STRIPE_PUBLISHABLE_KEY="pk_test_placeholder"
+ENV STRIPE_WEBHOOK_SECRET="whsec_placeholder"
+ENV STRIPE_BASIC_PRICE_ID="price_basic"
+ENV STRIPE_PRO_PRICE_ID="price_pro"
+ENV STRIPE_ENTERPRISE_PRICE_ID="price_enterprise"
+ENV NEXT_PUBLIC_STRIPE_BASIC_PRICE_ID="price_basic"
+ENV NEXT_PUBLIC_STRIPE_PRO_PRICE_ID="price_pro"
+ENV NEXT_PUBLIC_STRIPE_ENTERPRISE_PRICE_ID="price_enterprise"
+ENV NEXT_PUBLIC_APP_URL="http://localhost:3000"
+ENV NEXT_PUBLIC_APP_NAME="ProprioFinder"
+ENV REDIS_URL="redis://localhost:6379"
+ENV ENCRYPTION_SECRET="build-time-encryption-secret"
+ENV CRON_SECRET="build-time-cron-secret"
+ENV DROPCONTACT_API_KEY="placeholder"
+
 # Build Next.js application
 RUN npm run build
 
 # Remove dev dependencies after build
 RUN npm prune --production
+
+# ================================
+# RUNTIME CONFIGURATION
+# Real environment variables are set by Dokploy
+# ================================
 
 # Expose port
 ENV PORT=3000
