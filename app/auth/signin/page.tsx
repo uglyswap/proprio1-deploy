@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { Suspense, useState } from 'react'
 import { signIn } from 'next-auth/react'
 import { useRouter, useSearchParams } from 'next/navigation'
 import Link from 'next/link'
@@ -11,7 +11,10 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { Building2, CheckCircle2, Zap, TrendingUp, Database } from 'lucide-react'
 
-export default function SignInPage() {
+/**
+ * Form component that uses useSearchParams - must be wrapped in Suspense
+ */
+function SignInForm() {
   const router = useRouter()
   const searchParams = useSearchParams()
   const callbackUrl = searchParams.get('callbackUrl') || '/dashboard'
@@ -47,6 +50,136 @@ export default function SignInPage() {
     }
   }
 
+  return (
+    <Card className="border-2 shadow-xl">
+      <CardHeader className="space-y-1 pb-6">
+        <CardTitle className="text-3xl font-bold text-center">
+          Connexion
+        </CardTitle>
+        <CardDescription className="text-center text-base">
+          Connectez-vous à votre compte ProprioFinder
+        </CardDescription>
+      </CardHeader>
+      <form onSubmit={handleSubmit}>
+        <CardContent className="space-y-4">
+          {registered && (
+            <Alert className="bg-green-50 border-green-200">
+              <CheckCircle2 className="h-4 w-4 text-green-600" />
+              <AlertDescription className="text-green-800">
+                Compte créé avec succès ! Vous pouvez maintenant vous connecter.
+              </AlertDescription>
+            </Alert>
+          )}
+
+          {error && (
+            <Alert variant="destructive">
+              <AlertDescription>{error}</AlertDescription>
+            </Alert>
+          )}
+
+          <div className="space-y-2">
+            <Label htmlFor="email">Email</Label>
+            <Input
+              id="email"
+              type="email"
+              placeholder="nom@entreprise.com"
+              className="h-11"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              disabled={isLoading}
+            />
+          </div>
+
+          <div className="space-y-2">
+            <div className="flex items-center justify-between">
+              <Label htmlFor="password">Mot de passe</Label>
+              <Link
+                href="/auth/forgot-password"
+                className="text-sm text-primary hover:underline"
+              >
+                Mot de passe oublié ?
+              </Link>
+            </div>
+            <Input
+              id="password"
+              type="password"
+              className="h-11"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              disabled={isLoading}
+            />
+          </div>
+        </CardContent>
+
+        <CardFooter className="flex flex-col space-y-4">
+          <Button
+            type="submit"
+            className="w-full h-12 text-base"
+            size="lg"
+            disabled={isLoading}
+          >
+            {isLoading ? 'Connexion...' : 'Se connecter'}
+          </Button>
+
+          <div className="text-sm text-center text-muted-foreground">
+            Pas encore de compte ?{' '}
+            <Link href="/auth/signup" className="text-primary hover:underline font-semibold">
+              Créer un compte gratuitement
+            </Link>
+          </div>
+
+          <div className="pt-4 border-t dark:border-gray-700">
+            <div className="flex items-center justify-center gap-4 text-xs text-gray-600 dark:text-gray-300">
+              <div className="flex items-center gap-1">
+                <CheckCircle2 className="h-3 w-3 text-green-600 dark:text-green-400" />
+                <span>Essai gratuit 7 jours</span>
+              </div>
+              <div className="flex items-center gap-1">
+                <CheckCircle2 className="h-3 w-3 text-green-600 dark:text-green-400" />
+                <span>Sans carte bancaire</span>
+              </div>
+            </div>
+          </div>
+        </CardFooter>
+      </form>
+    </Card>
+  )
+}
+
+/**
+ * Loading skeleton for the form
+ */
+function SignInFormSkeleton() {
+  return (
+    <Card className="border-2 shadow-xl">
+      <CardHeader className="space-y-1 pb-6">
+        <CardTitle className="text-3xl font-bold text-center">
+          Connexion
+        </CardTitle>
+        <CardDescription className="text-center text-base">
+          Connectez-vous à votre compte ProprioFinder
+        </CardDescription>
+      </CardHeader>
+      <CardContent className="space-y-4">
+        <div className="space-y-2">
+          <div className="h-4 w-16 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+          <div className="h-11 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+        </div>
+        <div className="space-y-2">
+          <div className="h-4 w-24 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+          <div className="h-11 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+        </div>
+      </CardContent>
+      <CardFooter className="flex flex-col space-y-4">
+        <div className="w-full h-12 bg-gray-200 dark:bg-gray-700 rounded animate-pulse" />
+      </CardFooter>
+    </Card>
+  )
+}
+
+export default function SignInPage() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50 dark:from-gray-900 dark:via-gray-800 dark:to-gray-900">
       {/* Navbar */}
@@ -126,102 +259,11 @@ export default function SignInPage() {
             </div>
           </div>
 
-          {/* Right side - Form */}
+          {/* Right side - Form wrapped in Suspense */}
           <div>
-            <Card className="border-2 shadow-xl">
-              <CardHeader className="space-y-1 pb-6">
-                <CardTitle className="text-3xl font-bold text-center">
-                  Connexion
-                </CardTitle>
-                <CardDescription className="text-center text-base">
-                  Connectez-vous à votre compte ProprioFinder
-                </CardDescription>
-              </CardHeader>
-              <form onSubmit={handleSubmit}>
-                <CardContent className="space-y-4">
-                  {registered && (
-                    <Alert className="bg-green-50 border-green-200">
-                      <CheckCircle2 className="h-4 w-4 text-green-600" />
-                      <AlertDescription className="text-green-800">
-                        Compte créé avec succès ! Vous pouvez maintenant vous connecter.
-                      </AlertDescription>
-                    </Alert>
-                  )}
-
-                  {error && (
-                    <Alert variant="destructive">
-                      <AlertDescription>{error}</AlertDescription>
-                    </Alert>
-                  )}
-
-                  <div className="space-y-2">
-                    <Label htmlFor="email">Email</Label>
-                    <Input
-                      id="email"
-                      type="email"
-                      placeholder="nom@entreprise.com"
-                      className="h-11"
-                      value={email}
-                      onChange={(e) => setEmail(e.target.value)}
-                      required
-                      disabled={isLoading}
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <Label htmlFor="password">Mot de passe</Label>
-                      <Link
-                        href="/auth/forgot-password"
-                        className="text-sm text-primary hover:underline"
-                      >
-                        Mot de passe oublié ?
-                      </Link>
-                    </div>
-                    <Input
-                      id="password"
-                      type="password"
-                      className="h-11"
-                      value={password}
-                      onChange={(e) => setPassword(e.target.value)}
-                      required
-                      disabled={isLoading}
-                    />
-                  </div>
-                </CardContent>
-
-                <CardFooter className="flex flex-col space-y-4">
-                  <Button
-                    type="submit"
-                    className="w-full h-12 text-base"
-                    size="lg"
-                    disabled={isLoading}
-                  >
-                    {isLoading ? 'Connexion...' : 'Se connecter'}
-                  </Button>
-
-                  <div className="text-sm text-center text-muted-foreground">
-                    Pas encore de compte ?{' '}
-                    <Link href="/auth/signup" className="text-primary hover:underline font-semibold">
-                      Créer un compte gratuitement
-                    </Link>
-                  </div>
-
-                  <div className="pt-4 border-t dark:border-gray-700">
-                    <div className="flex items-center justify-center gap-4 text-xs text-gray-600 dark:text-gray-300">
-                      <div className="flex items-center gap-1">
-                        <CheckCircle2 className="h-3 w-3 text-green-600 dark:text-green-400" />
-                        <span>Essai gratuit 7 jours</span>
-                      </div>
-                      <div className="flex items-center gap-1">
-                        <CheckCircle2 className="h-3 w-3 text-green-600 dark:text-green-400" />
-                        <span>Sans carte bancaire</span>
-                      </div>
-                    </div>
-                  </div>
-                </CardFooter>
-              </form>
-            </Card>
+            <Suspense fallback={<SignInFormSkeleton />}>
+              <SignInForm />
+            </Suspense>
 
             {/* Mobile quick stats */}
             <div className="lg:hidden mt-8 grid grid-cols-2 gap-4">
