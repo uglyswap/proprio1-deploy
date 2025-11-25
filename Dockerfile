@@ -1,73 +1,45 @@
 # ================================
-# DOCKERFILE MULTI-STAGE OPTIMIZED
-# ProprioFinder SaaS - Next.js Standalone
+# DOCKERFILE SIMPLE - ProprioFinder
+# Single stage build for reliability
 # ================================
 
-# Stage 1: Dependencies
-FROM node:20-alpine AS deps
-RUN apk add --no-cache libc6-compat openssl
+FROM node:20-alpine
+
+# Install dependencies for node-gyp and Prisma
+RUN apk add --no-cache libc6-compat openssl python3 make g++
+
 WORKDIR /app
 
-# Copy package files
+# Copy package files first for better caching
 COPY package.json package-lock.json* ./
+
+# Install all dependencies
+RUN npm ci --legacy-peer-deps
+
+# Copy prisma schema and generate client
 COPY prisma ./prisma/
-
-# Install dependencies
-RUN npm ci
-
-# Generate Prisma Client
 RUN npx prisma generate
 
-# Stage 2: Builder
-FROM node:20-alpine AS builder
-RUN apk add --no-cache libc6-compat openssl
-WORKDIR /app
-
-# Copy dependencies from deps stage
-COPY --from=deps /app/node_modules ./node_modules
+# Copy all source files
 COPY . .
 
-# Disable telemetry
-ENV NEXT_TELEMETRY_DISABLED=1
+# Set production environment
 ENV NODE_ENV=production
+ENV NEXT_TELEMETRY_DISABLED=1
 
-# Build the application
+# Build Next.js application
 RUN npm run build
 
-# Stage 3: Runner (Production)
-FROM node:20-alpine AS runner
-RUN apk add --no-cache libc6-compat openssl
-WORKDIR /app
+# Remove dev dependencies after build
+RUN npm prune --production
 
-ENV NODE_ENV=production
-ENV NEXT_TELEMETRY_DISABLED=1
+# Expose port
 ENV PORT=3000
-ENV HOSTNAME="0.0.0.0"
-
-# Create non-root user for security
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
-
-# Copy public folder
-COPY --from=builder /app/public ./public
-
-# Set correct permissions for prerender cache
-RUN mkdir .next
-RUN chown nextjs:nodejs .next
-
-# Copy standalone build output
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-
-# Copy Prisma files for migrations
-COPY --from=builder /app/prisma ./prisma
-COPY --from=deps /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=deps /app/node_modules/@prisma ./node_modules/@prisma
-
-# Switch to non-root user
-USER nextjs
-
 EXPOSE 3000
 
-# Start the standalone server
-CMD ["node", "server.js"]
+# Health check
+HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1
+
+# Start the application using Next.js start
+CMD ["npm", "start"]
