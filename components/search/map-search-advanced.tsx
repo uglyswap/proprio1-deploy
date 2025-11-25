@@ -52,6 +52,7 @@ export default function MapSearchAdvanced({
   const markersClusterRef = useRef<L.MarkerClusterGroup | null>(null)
   const heatLayerRef = useRef<L.HeatLayer | null>(null)
   const geoWorkerRef = useRef<Worker | null>(null)
+  const fileInputRef = useRef<HTMLInputElement | null>(null)
 
   const [isLoading, setIsLoading] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
@@ -231,7 +232,7 @@ export default function MapSearchAdvanced({
         const geojson = JSON.parse(event.target?.result as string)
         const imported = geojson.features.map((feature: any, index: number) => ({
           id: Date.now() + index,
-          name: feature.properties.name || `Zone importée ${index + 1}`,
+          name: feature.properties.name || `Zone importee ${index + 1}`,
           coordinates: feature.geometry.coordinates[0],
           createdAt: feature.properties.createdAt || new Date().toISOString(),
         }))
@@ -315,7 +316,7 @@ export default function MapSearchAdvanced({
         polygon: {
           allowIntersection: false,
           showArea: true,
-          metric: true as any, // Use metric units (types are incorrect in @types/leaflet-draw)
+          metric: true as any,
           shapeOptions: {
             color: '#3b82f6',
             weight: 3,
@@ -460,8 +461,8 @@ export default function MapSearchAdvanced({
           marker.bindPopup(`
             <div class="p-2">
               <strong>${prop.adresse}</strong>
-              ${prop.proprietaire ? `<br/>Propriétaire: ${prop.proprietaire}` : ''}
-              ${prop.surface ? `<br/>Surface: ${prop.surface} m²` : ''}
+              ${prop.proprietaire ? `<br/>Proprietaire: ${prop.proprietaire}` : ''}
+              ${prop.surface ? `<br/>Surface: ${prop.surface} m2` : ''}
             </div>
           `)
         }
@@ -569,17 +570,20 @@ export default function MapSearchAdvanced({
             <Download className="h-4 w-4" />
           </Button>
 
-          <label>
-            <input
-              type="file"
-              accept=".geojson,.json"
-              className="hidden"
-              onChange={importZones}
-            />
-            <Button variant="outline" size="sm" as="span">
-              <Upload className="h-4 w-4" />
-            </Button>
-          </label>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".geojson,.json"
+            className="hidden"
+            onChange={importZones}
+          />
+          <Button
+            variant="outline"
+            size="sm"
+            onClick={() => fileInputRef.current?.click()}
+          >
+            <Upload className="h-4 w-4" />
+          </Button>
 
           <Button variant="outline" size="sm" onClick={toggleFullscreen}>
             {viewMode === 'fullscreen' ? (
@@ -616,7 +620,7 @@ export default function MapSearchAdvanced({
       {/* Saved Zones */}
       {savedZones.length > 0 && (
         <Card className="absolute bottom-4 left-4 z-[1000] p-3 max-w-xs max-h-60 overflow-y-auto">
-          <div className="text-sm font-medium mb-2">Zones sauvegardées</div>
+          <div className="text-sm font-medium mb-2">Zones sauvegardees</div>
           <div className="space-y-1">
             {savedZones.map((zone) => (
               <button
