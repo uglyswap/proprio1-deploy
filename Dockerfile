@@ -1,6 +1,7 @@
 # ================================
 # DOCKERFILE - ProprioFinder
 # Using standalone output mode for optimized Docker deployment
+# With Prisma migrations at startup
 # ================================
 
 FROM node:20-alpine AS base
@@ -90,9 +91,15 @@ RUN chown nextjs:nodejs .next
 COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
 COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
 
-# Copy Prisma client (required at runtime)
+# Copy Prisma files (required at runtime for migrations)
 COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
 COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
+COPY --from=builder /app/node_modules/prisma ./node_modules/prisma
+COPY --from=builder /app/prisma ./prisma
+
+# Copy entrypoint script
+COPY --from=builder --chown=nextjs:nodejs /app/docker-entrypoint.sh ./docker-entrypoint.sh
+RUN chmod +x ./docker-entrypoint.sh
 
 USER nextjs
 
@@ -101,9 +108,9 @@ ENV PORT=3000
 ENV HOSTNAME="0.0.0.0"
 EXPOSE 3000
 
-# Health check
-HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
+# Health check with longer start period for migrations
+HEALTHCHECK --interval=30s --timeout=10s --start-period=120s --retries=5 \
   CMD wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1
 
-# Start the standalone server
-CMD ["node", "server.js"]
+# Use entrypoint script to run migrations before starting
+ENTRYPOINT ["./docker-entrypoint.sh"]
