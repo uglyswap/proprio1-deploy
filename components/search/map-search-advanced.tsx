@@ -340,7 +340,7 @@ export default function MapSearchAdvanced({
           metric: true as any,
         },
         circlemarker: false,
-        marker: true,
+        marker: {},
         polyline: {
           shapeOptions: {
             color: '#ef4444',
