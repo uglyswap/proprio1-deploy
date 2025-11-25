@@ -1,5 +1,5 @@
 # ================================
-# DOCKERFILE ULTRA-SIMPLIFIÉ
+# DOCKERFILE ULTRA-SIMPLIFIED
 # ProprioFinder SaaS
 # ================================
 
