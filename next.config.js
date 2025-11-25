@@ -7,12 +7,12 @@ const nextConfig = {
 
   // Ignore TypeScript errors during build (temporary fix for leaflet-draw types)
   typescript: {
-    ignoreBuildErrors: true,
+    // ignoreBuildErrors: true, // FIXED: Re-enabled for safety
   },
 
   // Ignore ESLint during build
   eslint: {
-    ignoreDuringBuilds: true,
+    // ignoreDuringBuilds: true, // FIXED: Re-enabled for safety
   },
 
   // Transpile leaflet packages for CSS imports to work

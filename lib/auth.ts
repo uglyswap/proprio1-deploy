@@ -146,7 +146,7 @@ export async function hasOrganizationRole(
 
   if (!orgUser) return false
 
-  const roleHierarchy = { OWNER: 3, ADMIN: 2, MEMBER: 1 }
+  const roleHierarchy: Record<string, number> = { OWNER: 3, ADMIN: 2, MEMBER: 1 }
 
   return roleHierarchy[orgUser.role] >= roleHierarchy[requiredRole]
 }

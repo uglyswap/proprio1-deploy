@@ -63,13 +63,24 @@ async function getActiveSources() {
 }
 
 /**
+ * Sanitize SQL identifier to prevent injection
+ */
+function sanitizeIdentifier(identifier: string): string {
+  if (!/^[a-zA-Z0-9_]+$/.test(identifier)) {
+    throw new Error(`Invalid SQL identifier: ${identifier}`)
+  }
+  return identifier
+}
+
+/**
  * Construit un mapping de colonnes pour une source
  */
 function buildColumnMapping(source: any): Map<string, string> {
   const mapping = new Map<string, string>()
 
   source.mappings.forEach((m: any) => {
-    mapping.set(m.targetField, m.sourceColumn)
+    // Sanitize column names
+    mapping.set(m.targetField, sanitizeIdentifier(m.sourceColumn))
   })
 
   return mapping
@@ -275,25 +286,25 @@ async function enrichWithSirene(
       const sireneRow = sireneData.get(prop.siren)
 
       enriched.companyName = sireneRow[mapping.get('companyName') || 'denomination'] ||
-                             sireneRow[mapping.get('companyName') || 'nom_entreprise']
+        sireneRow[mapping.get('companyName') || 'nom_entreprise']
 
       enriched.dirigeantNom = sireneRow[mapping.get('dirigeantNom') || 'dirigeant_nom'] ||
-                              sireneRow[mapping.get('dirigeantNom') || 'nom_dirigeant']
+        sireneRow[mapping.get('dirigeantNom') || 'nom_dirigeant']
 
       enriched.dirigeantPrenom = sireneRow[mapping.get('dirigeantPrenom') || 'dirigeant_prenom'] ||
-                                 sireneRow[mapping.get('dirigeantPrenom') || 'prenom_dirigeant']
+        sireneRow[mapping.get('dirigeantPrenom') || 'prenom_dirigeant']
 
       enriched.dirigeantQualite = sireneRow[mapping.get('dirigeantQualite') || 'dirigeant_qualite'] ||
-                                  sireneRow[mapping.get('dirigeantQualite') || 'qualite']
+        sireneRow[mapping.get('dirigeantQualite') || 'qualite']
 
       enriched.siegeAdresse = sireneRow[mapping.get('siegeAdresse') || 'siege_adresse'] ||
-                              sireneRow[mapping.get('siegeAdresse') || 'adresse_siege']
+        sireneRow[mapping.get('siegeAdresse') || 'adresse_siege']
 
       enriched.siegeCodePostal = sireneRow[mapping.get('siegeCodePostal') || 'siege_code_postal'] ||
-                                 sireneRow[mapping.get('siegeCodePostal') || 'code_postal_siege']
+        sireneRow[mapping.get('siegeCodePostal') || 'code_postal_siege']
 
       enriched.siegeVille = sireneRow[mapping.get('siegeVille') || 'siege_ville'] ||
-                            sireneRow[mapping.get('siegeVille') || 'ville_siege']
+        sireneRow[mapping.get('siegeVille') || 'ville_siege']
     }
 
     return enriched

@@ -14,7 +14,16 @@ const TAG_POSITION = SALT_LENGTH + IV_LENGTH
 const ENCRYPTED_POSITION = TAG_POSITION + TAG_LENGTH
 
 function getKey(salt: Buffer): Buffer {
-  const secret = process.env.ENCRYPTION_SECRET || 'default-secret-change-me'
+  const secret = process.env.ENCRYPTION_SECRET
+
+  if (!secret) {
+    if (process.env.NODE_ENV === 'production') {
+      throw new Error('ENCRYPTION_SECRET is not set. Cannot encrypt/decrypt data safely.')
+    }
+    console.warn('⚠️ WARNING: ENCRYPTION_SECRET not set. Using unsafe default.')
+    return crypto.pbkdf2Sync('default-secret-change-me', salt, 100000, KEY_LENGTH, 'sha512')
+  }
+
   return crypto.pbkdf2Sync(secret, salt, 100000, KEY_LENGTH, 'sha512')
 }
 

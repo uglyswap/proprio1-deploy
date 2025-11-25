@@ -145,6 +145,15 @@ async function handlePaymentSucceeded(
   organizationId: string,
   subscription: Stripe.Subscription
 ) {
+  // ⚠️ Prevent double crediting:
+  // 'invoice.payment_succeeded' is triggered for the first payment (subscription creation).
+  // But 'checkout.session.completed' already handles the initial credits.
+  // We only want to add credits for renewals (recurring payments).
+  const invoice = await stripe.invoices.retrieve(subscription.latest_invoice as string)
+  if (invoice.billing_reason === 'subscription_create') {
+    return
+  }
+
   const plan = getPlanFromPriceId(subscription.items.data[0].price.id)
 
   // Renew monthly credits

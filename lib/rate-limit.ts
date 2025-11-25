@@ -153,7 +153,11 @@ export async function withRateLimit(
     }
   }
 
-  return result
+  return {
+    allowed: true,
+    remaining: result.remaining,
+    resetAt: result.resetAt,
+  }
 }
 
 /**

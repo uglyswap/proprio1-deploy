@@ -23,6 +23,7 @@ export const stripe = {
   get billingPortal() { return getStripe().billingPortal },
   get subscriptions() { return getStripe().subscriptions },
   get webhooks() { return getStripe().webhooks },
+  get invoices() { return getStripe().invoices },
 }
 
 export const STRIPE_PLANS = {
@@ -76,7 +77,7 @@ export async function getOrCreateStripeCustomer(
   organizationName: string
 ): Promise<string> {
   const { prisma } = await import('@/lib/prisma')
-  
+
   const existingOrg = await prisma.organization.findUnique({
     where: { id: organizationId },
     select: { stripeCustomerId: true }

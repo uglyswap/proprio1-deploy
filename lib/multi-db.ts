@@ -44,7 +44,7 @@ export async function getDataSourcePool(dataSourceId: string): Promise<Pool> {
     host: dataSource.host || 'localhost',
     port: dataSource.port || 5432,
     database: dataSource.database || 'postgres',
-    user: dataSource.username,
+    user: dataSource.username || undefined,
     password,
     max: 10, // Max 10 connexions par pool
     idleTimeoutMillis: 30000,

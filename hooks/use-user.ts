@@ -17,8 +17,8 @@ export function useUser() {
       setUser({
         id: session.user.id,
         email: session.user.email!,
-        name: session.user.name,
-        image: session.user.image,
+        name: session.user.name ?? null,
+        image: session.user.image ?? null,
       })
     } else {
       setUser(null)
