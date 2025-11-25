@@ -1,33 +1,32 @@
 # ================================
-# MULTI-STAGE DOCKERFILE - ProprioFinder
-# Optimized for Next.js standalone output
+# SIMPLE DOCKERFILE - ProprioFinder
+# Without standalone mode for maximum compatibility
 # ================================
 
-# Stage 1: Dependencies
-FROM node:20-alpine AS deps
-RUN apk add --no-cache libc6-compat openssl
+FROM node:20-alpine
+
+# Install system dependencies
+RUN apk add --no-cache libc6-compat openssl python3 make g++ wget
+
 WORKDIR /app
 
 # Copy package files
 COPY package.json package-lock.json* ./
+
+# Install all dependencies (including devDependencies for build)
 RUN npm ci --legacy-peer-deps
 
-# Stage 2: Builder
-FROM node:20-alpine AS builder
-RUN apk add --no-cache libc6-compat openssl python3 make g++
-WORKDIR /app
-
-# Copy dependencies from deps stage
-COPY --from=deps /app/node_modules ./node_modules
-COPY . .
-
-# Generate Prisma client
+# Copy prisma schema first for generate
+COPY prisma ./prisma/
 RUN npx prisma generate
+
+# Copy all source files
+COPY . .
 
 # ================================
 # BUILD-TIME ENVIRONMENT VARIABLES
-# Placeholders for Next.js static generation
-# Real values injected at runtime by Dokploy
+# Required for Next.js static generation
+# Real values are injected at runtime
 # ================================
 ENV NODE_ENV=production
 ENV NEXT_TELEMETRY_DISABLED=1
@@ -55,45 +54,16 @@ ENV DROPCONTACT_API_KEY="placeholder"
 # Build Next.js
 RUN npm run build
 
-# Stage 3: Runner (Production)
-FROM node:20-alpine AS runner
-RUN apk add --no-cache libc6-compat openssl wget
-WORKDIR /app
-
-ENV NODE_ENV=production
-ENV NEXT_TELEMETRY_DISABLED=1
-
-# Create non-root user
-RUN addgroup --system --gid 1001 nodejs
-RUN adduser --system --uid 1001 nextjs
-
-# Copy public folder
-COPY --from=builder /app/public ./public
-
-# Set correct permissions for prerender cache
-RUN mkdir .next
-RUN chown nextjs:nodejs .next
-
-# Copy standalone output
-COPY --from=builder --chown=nextjs:nodejs /app/.next/standalone ./
-COPY --from=builder --chown=nextjs:nodejs /app/.next/static ./.next/static
-
-# Copy Prisma files (required for runtime)
-COPY --from=builder /app/node_modules/.prisma ./node_modules/.prisma
-COPY --from=builder /app/node_modules/@prisma ./node_modules/@prisma
-COPY --from=builder /app/prisma ./prisma
-
-# Switch to non-root user
-USER nextjs
+# Remove dev dependencies to reduce image size
+RUN npm prune --production --legacy-peer-deps
 
 # Expose port
-EXPOSE 3000
 ENV PORT=3000
-ENV HOSTNAME="0.0.0.0"
+EXPOSE 3000
 
 # Health check
 HEALTHCHECK --interval=30s --timeout=10s --start-period=60s --retries=3 \
   CMD wget --no-verbose --tries=1 --spider http://localhost:3000/api/health || exit 1
 
-# Start the standalone server
-CMD ["node", "server.js"]
+# Start the server
+CMD ["npm", "start"]
