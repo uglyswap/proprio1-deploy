@@ -7,19 +7,38 @@ echo "========================================"
 echo "Starting at: $(date)"
 echo ""
 
-# Simple wait for database - give it time to be ready
-echo "Waiting 10 seconds for database to be ready..."
-sleep 10
+# Wait for database to be ready
+echo "Waiting for database to be ready..."
+sleep 5
+
+# Check database connection
+max_retries=30
+counter=0
+until node -e "
+const { PrismaClient } = require('@prisma/client');
+const prisma = new PrismaClient();
+prisma.\$connect().then(() => {
+  console.log('Database connected!');
+  process.exit(0);
+}).catch(() => process.exit(1));
+" 2>/dev/null; do
+  counter=$((counter + 1))
+  if [ $counter -ge $max_retries ]; then
+    echo "ERROR: Could not connect to database after $max_retries attempts"
+    echo "Starting anyway, migrations may fail..."
+    break
+  fi
+  echo "Waiting for database... attempt $counter/$max_retries"
+  sleep 2
+done
 
 # Run Prisma db push to sync schema
+echo ""
 echo "Running Prisma database push..."
-cd /app
 
-# Check if prisma schema exists
 if [ -f "./prisma/schema.prisma" ]; then
     echo "Found Prisma schema, pushing to database..."
-    # Use node_modules/.bin/prisma instead of npx
-    if ./node_modules/.bin/prisma db push --skip-generate --accept-data-loss; then
+    if node ./node_modules/prisma/build/index.js db push --skip-generate --accept-data-loss 2>/dev/null; then
         echo "Database schema synchronized successfully!"
     else
         echo "WARNING: Prisma db push had issues, continuing anyway..."
