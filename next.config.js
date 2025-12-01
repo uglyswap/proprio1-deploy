@@ -2,8 +2,8 @@
 const nextConfig = {
   reactStrictMode: true,
 
-  // Standalone disabled for nixpacks deployment
-  // output: 'standalone',
+  // Standalone mode for optimized Docker deployment
+  output: 'standalone',
 
   // Ignore TypeScript errors during build (temporary fix for leaflet-draw types)
   typescript: {
