@@ -100,8 +100,6 @@ services:
       NODE_ENV: production
     ports:
       - "3000:3000"
-    volumes:
-      - ./prisma:/app/prisma
     networks:
       - propriofinder-network
     healthcheck:
@@ -117,7 +115,7 @@ services:
   worker:
     build:
       context: .
-      dockerfile: Dockerfile
+      dockerfile: Dockerfile.worker
     container_name: propriofinder-worker
     restart: unless-stopped
     depends_on:
@@ -141,7 +139,6 @@ services:
       LOG_LEVEL: ${LOG_LEVEL:-info}
 
       NODE_ENV: production
-    command: node workers/enrichment-worker.js
     networks:
       - propriofinder-network
 
