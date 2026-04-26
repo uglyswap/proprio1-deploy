@@ -153,6 +153,18 @@ export async function closeAllPools() {
 }
 
 /**
+ * ✅ FIX: Ferme le pool d'une source de données spécifique
+ * Utile quand une source passe en INACTIVE
+ */
+export async function closeDataSourcePool(dataSourceId: string): Promise<void> {
+  const pool = connectionPools.get(dataSourceId)
+  if (pool) {
+    await pool.end()
+    connectionPools.delete(dataSourceId)
+  }
+}
+
+/**
  * Récupère les colonnes d'une table
  */
 export async function getTableColumns(dataSourceId: string): Promise<{

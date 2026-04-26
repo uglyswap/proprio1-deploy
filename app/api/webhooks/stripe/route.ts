@@ -38,12 +38,36 @@ export async function POST(req: NextRequest) {
   }
 
   try {
+    // 🔒 SÉCURITÉ: Idempotency - check if event was already processed
+    const existingEvent = await prisma.auditLog.findFirst({
+      where: {
+        action: 'API_CALL',
+        entity: 'StripeWebhook',
+        entityId: event.id,
+      },
+    })
+
+    if (existingEvent) {
+      log.info({ eventId: event.id, eventType: event.type }, 'Webhook event already processed (idempotency)')
+      return new NextResponse(null, { status: 200 })
+    }
+
     switch (event.type) {
       case 'checkout.session.completed': {
         const session = event.data.object as Stripe.Checkout.Session
         const organizationId = session.metadata?.organizationId
 
         if (!organizationId) break
+
+        // ✅ FIX: Check if subscription already exists (idempotency)
+        const existingSub = await prisma.subscription.findFirst({
+          where: { stripeSubscriptionId: session.subscription as string },
+        })
+
+        if (existingSub) {
+          log.warn({ subscriptionId: session.subscription }, 'Subscription already exists, skipping')
+          break
+        }
 
         const subscription = await stripe.subscriptions.retrieve(
           session.subscription as string
@@ -89,11 +113,22 @@ export async function POST(req: NextRequest) {
         })
 
         if (organization) {
-          await handleSubscriptionDeleted(organization.id)
+          await handleSubscriptionDeleted(organization.id, subscription)
         }
         break
       }
     }
+
+    // Record event as processed for idempotency
+    await prisma.auditLog.create({
+      data: {
+        action: 'API_CALL',
+        entity: 'StripeWebhook',
+        entityId: event.id,
+        description: `Stripe webhook event processed: ${event.type}`,
+        metadata: { eventType: event.type },
+      },
+    })
 
     log.info({ eventType: event.type }, 'Webhook processed successfully')
     return new NextResponse(null, { status: 200 })
@@ -112,6 +147,10 @@ async function handleSubscriptionCreated(
   subscription: Stripe.Subscription
 ) {
   const plan = getPlanFromPriceId(subscription.items.data[0].price.id)
+  if (!plan) {
+    log.error({ priceId: subscription.items.data[0].price.id }, 'Cannot determine plan for subscription')
+    return
+  }
 
   await prisma.subscription.create({
     data: {
@@ -155,6 +194,10 @@ async function handlePaymentSucceeded(
   }
 
   const plan = getPlanFromPriceId(subscription.items.data[0].price.id)
+  if (!plan) {
+    log.error({ priceId: subscription.items.data[0].price.id }, 'Cannot determine plan for payment')
+    return
+  }
 
   // Renew monthly credits
   const credits = PLAN_CREDITS[plan]
@@ -173,6 +216,10 @@ async function handleSubscriptionUpdated(
   subscription: Stripe.Subscription
 ) {
   const plan = getPlanFromPriceId(subscription.items.data[0].price.id)
+  if (!plan) {
+    log.error({ priceId: subscription.items.data[0].price.id }, 'Cannot determine plan for update')
+    return
+  }
 
   await prisma.subscription.updateMany({
     where: {
@@ -197,19 +244,37 @@ async function handleSubscriptionUpdated(
   })
 }
 
-async function handleSubscriptionDeleted(organizationId: string) {
+async function handleSubscriptionDeleted(organizationId: string, subscription: Stripe.Subscription) {
+  // Update the subscription record
+  await prisma.subscription.updateMany({
+    where: {
+      organizationId,
+      stripeSubscriptionId: subscription.id,
+    },
+    data: {
+      status: 'CANCELED',
+      cancelAtPeriodEnd: false,
+      canceledAt: subscription.canceled_at
+        ? new Date(subscription.canceled_at * 1000)
+        : new Date(),
+    },
+  })
+
+  // Downgrade organization plan to FREE
   await prisma.organization.update({
     where: { id: organizationId },
     data: { plan: 'FREE' },
   })
+
+  log.info({ organizationId }, 'Subscription deleted, organization downgraded to FREE')
 }
 
-function getPlanFromPriceId(priceId: string): SubscriptionPlan {
+function getPlanFromPriceId(priceId: string): SubscriptionPlan | null {
   if (priceId === process.env.STRIPE_BASIC_PRICE_ID) return 'BASIC'
   if (priceId === process.env.STRIPE_PRO_PRICE_ID) return 'PRO'
   if (priceId === process.env.STRIPE_ENTERPRISE_PRICE_ID) return 'ENTERPRISE'
 
-  // ❌ SÉCURITÉ: Ne jamais retourner FREE pour un prix inconnu
-  // Un client qui paie doit toujours recevoir son plan
-  throw new Error(`Unknown Stripe price ID: ${priceId}. Cannot determine subscription plan.`)
+  // ✅ FIX: Log error instead of throwing — throwing crashes the webhook handler
+  console.error(`[Stripe Webhook] Unknown price ID: ${priceId}`)
+  return null
 }

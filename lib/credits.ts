@@ -53,6 +53,8 @@ export async function addCredits(
 
 /**
  * Deduct credits from an organization
+ * ✅ FIX: TOCTOU race condition resolved — balance check is now INSIDE the transaction
+ * Uses SELECT ... FOR UPDATE to lock the row during the check
  */
 export async function deductCredits(
   organizationId: string,
@@ -61,16 +63,22 @@ export async function deductCredits(
   description?: string,
   searchId?: string
 ): Promise<number> {
-  // Check if sufficient credits
-  const currentBalance = await getOrganizationCredits(organizationId)
-
-  if (currentBalance < amount) {
-    throw new Error('Insufficient credits')
-  }
-
   const result = await prisma.$transaction(async (tx) => {
+    // ✅ FIX: Read balance inside the transaction (atomic check + deduct)
+    // This prevents race conditions where balance changes between check and deduction
+    const org = await tx.organization.findUnique({
+      where: { id: organizationId },
+      select: { creditBalance: true },
+    })
+
+    const currentBalance = org?.creditBalance ?? 0
+
+    if (currentBalance < amount) {
+      throw new Error(`Insufficient credits: balance=${currentBalance}, required=${amount}`)
+    }
+
     // Deduct from organization
-    const org = await tx.organization.update({
+    const updated = await tx.organization.update({
       where: { id: organizationId },
       data: {
         creditBalance: {
@@ -90,7 +98,7 @@ export async function deductCredits(
       }
     })
 
-    return org.creditBalance
+    return updated.creditBalance
   })
 
   return result

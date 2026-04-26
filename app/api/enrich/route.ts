@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth'
 import { authOptions } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { Queue } from 'bullmq'
+import { withRateLimit } from '@/lib/rate-limit'
 
 const enrichmentQueue = new Queue('contact-enrichment', {
   connection: {
@@ -17,6 +18,12 @@ export async function POST(req: NextRequest) {
 
     if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    // ✅ RATE LIMITING
+    const rateLimit = await withRateLimit(req, 'API_GENERAL', async () => session?.user?.id || null)
+    if (!rateLimit.allowed) {
+      return NextResponse.json({ error: rateLimit.error }, { status: 429 })
     }
 
     const { searchId } = await req.json()

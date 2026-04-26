@@ -8,6 +8,11 @@ interface EnrichmentJob {
   organizationId: string
 }
 
+// ✅ IMPROVEMENT: Batch processing with concurrency (was sequential 1s per property)
+const ENRICHMENT_CONCURRENCY = 3
+const ENRICHMENT_RATE_LIMIT_MS = 1000 // 1 request per second per worker
+const ENRICHMENT_COST_PER_CONTACT = parseFloat(process.env.ENRICHMENT_COST_PER_CONTACT || '0.02')
+
 const worker = new Worker<EnrichmentJob>(
   'contact-enrichment',
   async (job: Job<EnrichmentJob>) => {
@@ -30,54 +35,79 @@ const worker = new Worker<EnrichmentJob>(
     let failureCount = 0
     let totalCost = 0
 
-    for (const [index, property] of properties.entries()) {
-      try {
-        // Parse proprietaire name
-        const { firstName, lastName } = parseProprietaireName(
-          property.proprietaire
-        )
+    // ✅ FIX: Process properties in batches with controlled concurrency
+    // instead of sequential 1s per property
+    const batchSize = ENRICHMENT_CONCURRENCY
+    const batches: typeof properties[] = []
 
-        // Skip if no valid name
-        if (!lastName) {
+    for (let i = 0; i < properties.length; i += batchSize) {
+      batches.push(properties.slice(i, i + batchSize))
+    }
+
+    for (const [batchIndex, batch] of batches.entries()) {
+      // Process batch in parallel
+      const results = await Promise.allSettled(
+        batch.map(async (property) => {
+          // Parse proprietaire name
+          const { firstName, lastName } = parseProprietaireName(
+            property.proprietaire
+          )
+
+          // Skip if no valid name (company without person)
+          if (!lastName) {
+            return { success: false, skipped: true }
+          }
+
+          // Enrich with Dropcontact
+          const contactData = await enrichWithDropcontact({
+            first_name: firstName,
+            last_name: lastName,
+            company: property.companyName || undefined,
+          })
+
+          // Update property with enriched data
+          await prisma.property.update({
+            where: { id: property.id },
+            data: {
+              email: contactData.email,
+              emailVerified: contactData.email_verified,
+              phone: contactData.phone,
+              mobilePhone: contactData.mobile_phone,
+              linkedin: contactData.linkedin,
+              jobTitle: contactData.job_title,
+              enrichedAt: new Date(),
+              enrichmentConfidence: contactData.confidence,
+            },
+          })
+
+          return { success: true, skipped: false }
+        })
+      )
+
+      // Count results
+      for (const result of results) {
+        if (result.status === 'fulfilled') {
+          if (result.value.skipped) {
+            failureCount++
+          } else if (result.value.success) {
+            successCount++
+            totalCost += ENRICHMENT_COST_PER_CONTACT
+          } else {
+            failureCount++
+          }
+        } else {
+          console.error('Property enrichment failed:', result.reason)
           failureCount++
-          continue
         }
-
-        // Enrich with Dropcontact
-        const contactData = await enrichWithDropcontact({
-          first_name: firstName,
-          last_name: lastName,
-          company: property.companyName || undefined,
-        })
-
-        // Update property with enriched data
-        await prisma.property.update({
-          where: { id: property.id },
-          data: {
-            email: contactData.email,
-            emailVerified: contactData.email_verified,
-            phone: contactData.phone,
-            mobilePhone: contactData.mobile_phone,
-            linkedin: contactData.linkedin,
-            jobTitle: contactData.job_title,
-            enrichedAt: new Date(),
-            enrichmentConfidence: contactData.confidence,
-          },
-        })
-
-        successCount++
-        totalCost += 0.02 // 2 centimes per enrichment
-
-        // Update job progress
-        const progress = ((index + 1) / properties.length) * 100
-        await job.updateProgress(progress)
-
-        // Rate limiting: 1 request per second
-        await new Promise((resolve) => setTimeout(resolve, 1000))
-      } catch (error) {
-        console.error(`Failed to enrich property ${property.id}:`, error)
-        failureCount++
       }
+
+      // Update job progress
+      const processed = (batchIndex + 1) * batchSize
+      const progress = Math.min((processed / properties.length) * 100, 100)
+      await job.updateProgress(progress)
+
+      // Rate limiting: wait between batches
+      await new Promise((resolve) => setTimeout(resolve, ENRICHMENT_RATE_LIMIT_MS))
     }
 
     // Log enrichment
@@ -127,6 +157,10 @@ const worker = new Worker<EnrichmentJob>(
       port: parseInt(process.env.REDIS_PORT || '6379'),
     },
     concurrency: 1, // Process one job at a time to respect rate limits
+    limiter: {
+      max: 1,
+      duration: 1000,
+    },
   }
 )
 

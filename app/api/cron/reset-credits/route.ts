@@ -32,6 +32,15 @@ export async function GET(request: NextRequest) {
       )
     }
 
+    // ✅ FIX: Also check Vercel Cron header as fallback
+    const isVercelCron = request.headers.get('x-vercel-cron') === 'true'
+    if (cronSecret && !isVercelCron && authHeader !== `Bearer ${cronSecret}`) {
+      return NextResponse.json(
+        { error: 'Unauthorized - Invalid cron secret' },
+        { status: 401 }
+      )
+    }
+
     console.log('🔄 CRON: Début du reset mensuel des crédits...')
 
     // Reset des crédits

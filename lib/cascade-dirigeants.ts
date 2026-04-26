@@ -233,16 +233,46 @@ export async function findUltimateDirigeants(siren: string): Promise<CascadeSear
 }
 
 /**
- * Recherche en batch pour plusieurs SIREN
+ * Recherche en batch pour plusieurs SIREN avec concurrence contrôlée
+ * ✅ FIX: Utilise Promise.allSettled avec batching au lieu de séquentiel
  */
 export async function findUltimateDirigeantsBatch(
   sirens: string[]
 ): Promise<Map<string, CascadeSearchResult>> {
   const results = new Map<string, CascadeSearchResult>();
 
-  for (const siren of sirens) {
-    const result = await findUltimateDirigeants(siren);
-    results.set(siren, result);
+  // ✅ FIX: Process in batches of 5 for better performance
+  const batchSize = 5;
+  const batches: string[][] = [];
+
+  for (let i = 0; i < sirens.length; i += batchSize) {
+    batches.push(sirens.slice(i, i + batchSize));
+  }
+
+  for (const batch of batches) {
+    // Process batch in parallel
+    const batchResults = await Promise.allSettled(
+      batch.map(siren => findUltimateDirigeants(siren))
+    );
+
+    // Collect results
+    batch.forEach((siren, index) => {
+      const result = batchResults[index];
+      if (result.status === 'fulfilled') {
+        results.set(siren, result.value);
+      } else {
+        results.set(siren, {
+          sirenOriginal: siren,
+          entrepriseOriginale: '',
+          dirigeantsUltimes: [],
+          erreurs: [`Erreur interne: ${result.reason}`],
+          tempsRecherche: 0,
+        });
+      }
+    });
+
+    // Rate limit between batches
+    await delay(REQUEST_DELAY * 2);
   }
 
   return results;

@@ -31,11 +31,11 @@ export async function checkCreditsReset(organizationId: string): Promise<boolean
     return true
   }
 
-  // Vérifier si un mois s'est écoulé
-  const oneMonthAgo = new Date(now)
-  oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1)
+  // ✅ FIX: Use a robust 30-day window comparison instead of setMonth(-1)
+  // setMonth can behave unexpectedly on 28/30/31 day boundaries
+  const thirtyOneDaysAgo = new Date(now.getTime() - (31 * 24 * 60 * 60 * 1000))
 
-  if (lastReset < oneMonthAgo) {
+  if (lastReset < thirtyOneDaysAgo) {
     await resetOrganizationCredits(organizationId)
     return true
   }
@@ -98,8 +98,8 @@ export async function resetOrganizationCredits(organizationId: string): Promise<
  */
 export async function resetAllOrganizationsCredits(): Promise<number> {
   const now = new Date()
-  const oneMonthAgo = new Date(now)
-  oneMonthAgo.setMonth(oneMonthAgo.getMonth() - 1)
+  // ✅ FIX: Use robust 31-day window instead of setMonth
+  const thirtyOneDaysAgo = new Date(now.getTime() - (31 * 24 * 60 * 60 * 1000))
 
   // Trouver toutes les organisations qui ont besoin d'un reset
   const organizations = await prisma.organization.findMany({
@@ -108,7 +108,7 @@ export async function resetAllOrganizationsCredits(): Promise<number> {
       plan: { not: 'FREE' },
       OR: [
         { creditsResetAt: null },
-        { creditsResetAt: { lt: oneMonthAgo } },
+        { creditsResetAt: { lt: thirtyOneDaysAgo } },
       ],
     },
     select: {

@@ -4,6 +4,7 @@ import { authOptions, getUserOrganization } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { deductCredits } from '@/lib/credits'
 import { validateRequest, searchValidateSchema } from '@/lib/validations'
+import { withRateLimit } from '@/lib/rate-limit'
 
 export async function POST(req: NextRequest) {
   try {
@@ -11,6 +12,12 @@ export async function POST(req: NextRequest) {
 
     if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    // ✅ RATE LIMITING
+    const rateLimit = await withRateLimit(req, 'API_SEARCH', async () => session?.user?.id || null)
+    if (!rateLimit.allowed) {
+      return NextResponse.json({ error: rateLimit.error }, { status: 429 })
     }
 
     // ✅ SÉCURITÉ: Validation Zod des inputs

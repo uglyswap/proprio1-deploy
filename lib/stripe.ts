@@ -9,7 +9,7 @@ export function getStripe(): Stripe {
       throw new Error('STRIPE_SECRET_KEY is not set')
     }
     stripeInstance = new Stripe(process.env.STRIPE_SECRET_KEY, {
-      apiVersion: '2023-10-16',
+      apiVersion: '2025-04-30.basil', // Updated to latest stable API version
       typescript: true,
     })
   }

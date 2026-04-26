@@ -1,10 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServerSession } from 'next-auth'
-import { authOptions } from '@/lib/auth'
+import { authOptions, getUserOrganization } from '@/lib/auth'
 import { prisma } from '@/lib/prisma'
 import { deductCredits } from '@/lib/credits'
 import { searchByAddress, searchByOwner, searchByZone } from '@/lib/data-crosser'
 import { planConfig } from '@/lib/system-config'
+import { withRateLimit } from '@/lib/rate-limit'
 
 export async function POST(req: NextRequest) {
   try {
@@ -12,6 +13,12 @@ export async function POST(req: NextRequest) {
 
     if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    }
+
+    // ✅ RATE LIMITING
+    const rateLimit = await withRateLimit(req, 'API_SEARCH', async () => session?.user?.id || null)
+    if (!rateLimit.allowed) {
+      return NextResponse.json({ error: rateLimit.error }, { status: 429 })
     }
 
     const { searchId } = await req.json()
@@ -23,6 +30,17 @@ export async function POST(req: NextRequest) {
 
     if (!search) {
       return NextResponse.json({ error: 'Search not found' }, { status: 404 })
+    }
+
+    // ✅ SÉCURITÉ: Verify user belongs to the organization
+    const userOrg = await getUserOrganization(session.user.id)
+    if (!userOrg || search.organizationId !== userOrg.id) {
+      return NextResponse.json({ error: 'Unauthorized - Organization mismatch' }, { status: 403 })
+    }
+
+    // ✅ SÉCURITÉ: Verify user is the one who created the search
+    if (search.userId !== session.user.id) {
+      return NextResponse.json({ error: 'Unauthorized - Not your search' }, { status: 403 })
     }
 
     // Verify search is validated
